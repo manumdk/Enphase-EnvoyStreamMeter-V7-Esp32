@@ -1,3 +1,16 @@
+/* -------------------------------------------------------------------------------------------------
+Ce code permet de récupérer le flow de data envoyé toutes les secondes par la passerelle Envoy S du 
+fabricant Enphase de micro onduleur photovoltaïque.
+Je l'ai adapté à la version de firmware de l'Envoy V7 déployé depuis peu par Enphase.
+J'ai repris le principe de l'authentification JWT que Kristof @TofMassilia13320 a publié récemment 
+sur son fork du Pv router xlyric/pv-router-esp32 Pour comprendre le fonctionnement, j’ai utilisé un flow 
+sous NodeRed. https://community.jeedom.com/t/tuto-enphase-metered-node-red-jmqtt/87453
+Le token doit être récupéré en se connectant sur la passerelle Envoy depuis un PC et rentré dans le code.
+Pour simplifier le débogage, le partage et les updates, les infos SSID, PWD, URL, et Token sont sauvegardés via la librairie Preferences.
+https://github.com/manumdk/Enphase-EnvoyStreamMeter-V7-Esp32
+------------------------------------------------------------------------------------------------- */ 
+
+
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
@@ -10,6 +23,17 @@ Preferences prefEnvoy;
 At the first compilation plan to enter the credentials and the token
 Information is saved in flash
 */
+
+// #define DEBUG
+// #ifdef DEBUG
+// #define serial_print(x) Serial.print(x)
+// #define serial.printf(x) Serial.printf(x)
+// #define serial_println(x) Serial.println(x)
+// #else
+// #define serial_print(x)
+// #define serial.printf(x)
+// #define serial_println(x)
+// #endif
 
 // #define SaveCredentials
 
@@ -57,160 +81,6 @@ const char *enphase_conf = "/enphase.json";
 
 HTTPClient https;
 String SessionId;
-
-bool Enphase_get_7_Stream(void)
-{
-
-  int httpCode;
-  bool retour = false;
-  String adr = String(envoy.host);
-  String url = "/404.html";
-  if (String(envoy.type) == "R")
-  {
-    url = String(EnvoyR);
-    Serial.print("type R ");
-    Serial.println(url);
-  }
-  if (String(envoy.type) == "S")
-  {
-    url = String(EnvoyStream);
-    Serial.print("type S ");
-    Serial.println(url);
-  }
-
-  // Serial.println("Enphase Get production : https://" + adr + url);
-  Serial.printf("[envoyTask]  ligne %d http://", __LINE__);
-  Serial.println(adr + url);
-
-  if (https.begin("https://" + adr + url))
-  {
-    Serial.printf("[envoyTask] --------  ligne %d Begin OK \n", __LINE__);
-    https.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
-    https.setAuthorizationType("Bearer");
-    https.setAuthorization(envoy.token.c_str());
-    https.addHeader("Accept-Encoding", "gzip, deflate, br");
-    https.addHeader("User-Agent", "PvRouter/1.1.1");
-    https.setReuse(true);
-    if (!SessionId.isEmpty())
-    {
-      https.addHeader("Cookie", SessionId);
-    }
-  }
-  httpCode = https.GET();
-  Serial.printf("[envoyTask]  ligne %d http , error: %d \n", __LINE__, httpCode);
-
-  // while (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
-  while (httpCode == 200)
-  {
-    String payload;
-    WiFiClient *cl = https.getStreamPtr();
-    int error = 0;
-    do
-    {
-      cl->find("data: ");
-      payload = cl->readStringUntil('\n');
-      // cl->flush();
-
-      Serial.printf("[envoyTask] --------  ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
-
-    } while (error);
-    cl->stop();
-    https.end();
-
-    retour = true;
-    Serial.printf("[envoyTask]  ligne %d fin de la réception\n", __LINE__);
-
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-    Serial.printf("[envoyTask]  ligne %d begin du https://", __LINE__);
-    Serial.println(adr + url);
-    if (https.connected())
-    {
-      bool ret = https.begin("https://" + adr + url);
-      Serial.printf("[envoyTask] ligne %d Begin OK : %d \n", __LINE__, ret);
-      https.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
-      https.setAuthorizationType("Bearer");
-      https.setAuthorization(envoy.token.c_str());
-      https.addHeader("Accept-Encoding", "gzip, deflate, br");
-      https.addHeader("User-Agent", "PvRouter/1.1.1");
-      https.setReuse(true);
-      if (!SessionId.isEmpty())
-      {
-        https.addHeader("Cookie", SessionId);
-      }
-    }
-    httpCode = https.GET();
-    Serial.printf("[envoyTask] ligne %d code http : %d \n", __LINE__, httpCode);
-  } // fin du While
-
-  Serial.printf("[envoyTask]  ligne %d GET... failed , error: %d \n", __LINE__, httpCode);
-  Serial.printf("[envoyTask]  ligne %d GET... failed , error: %s \n", __LINE__, https.errorToString(httpCode).c_str());
-  https.end();
-  return retour;
-}
-
-bool Enphase_get_7_JWT(void)
-{
-
-  bool retour = false;
-  String url = "/404.html";
-  url = String(EnvoyJ);
-  String adr = String(envoy.host);
-  Serial.println("[Enphase_get_7_JWT] Enphase contrôle tocken : https://" + adr + url);
-  // Initializing an HTTPS communication using the secure client
-  if (https.begin("https://" + adr + url))
-  {
-    https.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
-    https.setAuthorizationType("Bearer");
-    https.setAuthorization(envoy.token.c_str());
-    https.addHeader("Accept-Encoding", "gzip, deflate, br");
-    https.addHeader("User-Agent", "PvRouter/1.1.1");
-    const char *headerkeys[] = {"Set-Cookie"};
-    https.collectHeaders(headerkeys, sizeof(headerkeys) / sizeof(char *));
-    int httpCode = https.GET();
-    Serial.printf("[Enphase_get_7_JWT] %d httpCode : %d \n", __LINE__, httpCode);
-
-    // httpCode will be negative on error
-    // Serial.println("Enphase_Get_7 : httpcode : " + httpCode);
-    if (httpCode > 0)
-    {
-      if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
-      {
-        retour = true;
-        // Token valide
-        Serial.println("[Enphase_get_7_JWT] Enphase contrôle tocket : TOKEN VALIDE ");
-        SessionId.clear();
-        SessionId = https.header("Set-Cookie");
-      }
-      else
-      {
-        Serial.println("[Enphase_get_7_JWT] Enphase contrôle tocket : TOKEN INVALIDE !!!");
-        https.end();
-      }
-    }
-  }
-  https.end();
-  return retour;
-}
-
-void Enphase_get_7(void)
-{
-
-  if (WiFi.isConnected())
-  {
-    // create an HTTPClient instance
-    if (SessionId.isEmpty() || Enphase_get_7_Stream() == false)
-    { // Permet de lancer le contrôle du token une fois au démarrage (Empty SessionId)
-      SessionId.clear();
-      Serial.printf("[Enphase_get_7] Enphase version 7, token : %s \n", envoy.token.c_str());
-      Enphase_get_7_JWT();
-    }
-  }
-  else
-  {
-    Serial.println("Enphase version 7 : ERROR");
-  }
-}
 
 void serial_read()
 {
@@ -269,7 +139,7 @@ void serial_read()
     if (index != -1)
     {
       credentials.password = message_get.substring(5, message_get.length());
-      Serial.println("password enregistré: " + credentials.ssid);
+      Serial.println("password enregistré: " + credentials.password);
       prefWifi.putString("password", credentials.password);
       return;
     }
@@ -357,6 +227,172 @@ void serial_read()
   }
 }
 
+bool Enphase_get_7_Stream(void)
+{
+
+  int httpCode;
+  bool retour = false;
+  String adr = String(envoy.host);
+  String url = "/404.html";
+  if (String(envoy.type) == "R")
+  {
+    url = String(EnvoyR);
+    Serial.print("type R ");
+    Serial.println(url);
+  }
+  if (String(envoy.type) == "S")
+  {
+    url = String(EnvoyStream);
+    Serial.print("type S ");
+    Serial.println(url);
+  }
+
+  // Serial.println("Enphase Get production : https://" + adr + url);
+
+  Serial.printf("[envoyTask] ligne %d http://", __LINE__);
+  Serial.println(adr + url);
+
+  if (https.begin("https://" + adr + url))
+  {
+#ifdef DEBUG
+    Serial.printf("[envoyTask] ligne %d Begin OK \n", __LINE__);
+#endif
+    https.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
+    https.setAuthorizationType("Bearer");
+    https.setAuthorization(envoy.token.c_str());
+    https.addHeader("Accept-Encoding", "gzip, deflate, br");
+    https.addHeader("User-Agent", "PvRouter/1.1.1");
+    https.setReuse(true);
+    if (!SessionId.isEmpty())
+    {
+      https.addHeader("Cookie", SessionId);
+    }
+  }
+  httpCode = https.GET();
+  Serial.printf("[envoyTask] ligne %d http , error: %d \n", __LINE__, httpCode);
+
+  // while (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
+  while (httpCode == 200)
+  {
+    String payload;
+    WiFiClient *cl = https.getStreamPtr();
+    int error = 0;
+    do
+    {
+      cl->find("data: ");
+      payload = cl->readStringUntil('\n');
+      // cl->flush();
+      if (payload.length() > 5)
+        Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
+
+    } while (error);
+    cl->stop();
+    https.end();
+
+    retour = true;
+#ifdef DEBUG
+    Serial.printf("[envoyTask] ligne %d fin de la réception\n", __LINE__);
+#endif
+    serial_read();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+#ifdef DEBUG
+    Serial.printf("[envoyTask] ligne %d begin du https://", __LINE__);
+    Serial.println(adr + url);
+#endif
+
+    if (https.connected())
+    {
+      bool ret = https.begin("https://" + adr + url);
+#ifdef DEBUG
+      Serial.printf("[envoyTask] ligne %d Begin OK : %d \n", __LINE__, ret);
+#endif
+      https.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
+      https.setAuthorizationType("Bearer");
+      https.setAuthorization(envoy.token.c_str());
+      https.addHeader("Accept-Encoding", "gzip, deflate, br");
+      https.addHeader("User-Agent", "PvRouter/1.1.1");
+      https.setReuse(true);
+      if (!SessionId.isEmpty())
+      {
+        https.addHeader("Cookie", SessionId);
+      }
+    }
+    httpCode = https.GET();
+#ifdef DEBUG
+    Serial.printf("[envoyTask] ligne %d code http : %d \n", __LINE__, httpCode);
+#endif
+  } // fin du While
+
+  Serial.printf("[envoyTask] ligne %d GET... failed , error: %d \n", __LINE__, httpCode);
+  Serial.printf("[envoyTask] ligne %d GET... failed , error: %s \n", __LINE__, https.errorToString(httpCode).c_str());
+  https.end();
+  return retour;
+}
+
+bool Enphase_get_7_JWT(void)
+{
+
+  bool retour = false;
+  String url = "/404.html";
+  url = String(EnvoyJ);
+  String adr = String(envoy.host);
+  Serial.println("[Enphase_get_7_JWT] Enphase contrôle tocken : https://" + adr + url);
+  // Initializing an HTTPS communication using the secure client
+  if (https.begin("https://" + adr + url))
+  {
+    https.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
+    https.setAuthorizationType("Bearer");
+    https.setAuthorization(envoy.token.c_str());
+    https.addHeader("Accept-Encoding", "gzip, deflate, br");
+    https.addHeader("User-Agent", "PvRouter/1.1.1");
+    const char *headerkeys[] = {"Set-Cookie"};
+    https.collectHeaders(headerkeys, sizeof(headerkeys) / sizeof(char *));
+    int httpCode = https.GET();
+    Serial.printf("[Enphase_get_7_JWT] %d httpCode : %d \n", __LINE__, httpCode);
+
+    // httpCode will be negative on error
+    // Serial.println("Enphase_Get_7 : httpcode : " + httpCode);
+    if (httpCode > 0)
+    {
+      if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
+      {
+        retour = true;
+        // Token valide
+        Serial.println("[Enphase_get_7_JWT] Enphase contrôle tocket : TOKEN VALIDE ");
+        SessionId.clear();
+        SessionId = https.header("Set-Cookie");
+      }
+      else
+      {
+        Serial.println("[Enphase_get_7_JWT] Enphase contrôle tocket : TOKEN INVALIDE !!!");
+        https.end();
+      }
+    }
+  }
+  https.end();
+  return retour;
+}
+
+void Enphase_get_7(void)
+{
+
+  if (WiFi.isConnected())
+  {
+    // create an HTTPClient instance
+    if (SessionId.isEmpty() || Enphase_get_7_Stream() == false)
+    { // Permet de lancer le contrôle du token une fois au démarrage (Empty SessionId)
+      SessionId.clear();
+      Serial.printf("[Enphase_get_7] Enphase version 7, token : %s \n", envoy.token.c_str());
+      Enphase_get_7_JWT();
+    }
+  }
+  else
+  {
+    Serial.println("Enphase version 7 : ERROR");
+  }
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -371,7 +407,9 @@ void setup()
   prefEnvoy.putString("port", cport);
   prefEnvoy.putString("type", ctype);
   prefEnvoy.putString("token", ctoken);
-  Serial.println("Credentials Saved using Preferences");
+  prefEnvoy.putString("pswd", cpswd);
+  prefEnvoy.putString("mail", cmail);
+  Serial.println("prefEnvoy Saved using Preferences");
   prefEnvoy.end();
   Serial.println("Recompile the code without SaveCredentials");
   while (1)
@@ -388,12 +426,17 @@ void setup()
   envoy.port = prefEnvoy.getString("port", "80");
   envoy.type = prefEnvoy.getString("type", "S");
   envoy.token = prefEnvoy.getString("token", "");
+  envoy.pswd = prefEnvoy.getString("pswd", "pass-a-saisir");
+  envoy.mail = prefEnvoy.getString("mail", "envoy@enphase.tutu");
+
   prefEnvoy.end();
 
   Serial.printf("[SETUP] ligne %d host : %s \n", __LINE__, envoy.host.c_str());
   Serial.printf("[SETUP] ligne %d port : %s \n", __LINE__, envoy.port.c_str());
   Serial.printf("[SETUP] ligne %d type : %s \n", __LINE__, envoy.type.c_str());
   Serial.printf("[SETUP] ligne %d token : %s \n", __LINE__, envoy.token.c_str());
+  Serial.printf("[SETUP] ligne %d mail : %s \n", __LINE__, envoy.mail.c_str());
+  Serial.printf("[SETUP] ligne %d pswd : %s \n", __LINE__, envoy.pswd.c_str());
 
   if (credentials.ssid == "" || credentials.password == "")
   {
@@ -418,7 +461,6 @@ void setup()
 
 void loop()
 {
-  Serial.println("Passage LOOP");
   if (WiFi.status() == WL_CONNECTED)
   {
     Serial.println("WIFI_OK");
