@@ -94,7 +94,8 @@ bool Enphase_get_7_Stream(void)
       payload = cl->readStringUntil('\n');
       // cl->flush();
 
-      Serial.printf("[envoyTask] --------  ligne %d Payload : %s \n", __LINE__, payload.c_str());
+      Serial.printf("[envoyTask] --------  ligne %d Payload : lg %d \n%s\n", __LINE__,payload.length(), payload.c_str());
+
     } while (error);
     cl->stop();
     https.end();
