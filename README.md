@@ -8,5 +8,3 @@ https://community.jeedom.com/t/tuto-enphase-metered-node-red-jmqtt/87453
 
 Le token doit être récupéré en se connectant sur la passerelle Envoy depuis un PC et rentré dans le code.
 Pour simplifier le débogage, le partage et les updates, les infos SSID, PWD, URL, et Token sont sauvegardés via la librairie Preferences.
-
-Une évolution avec la biliothéque mobizt/Firebase ESP32 Client serait très certainement intéressant pour suivre les messages avec des events et non du pooling.
