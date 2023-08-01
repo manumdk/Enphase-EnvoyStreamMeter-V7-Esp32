@@ -74,11 +74,13 @@ bool Enphase_get_7_Stream(void)
       // cl->flush();
       if (payload.length() > 5)
         Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
-      // vTaskDelay(300 / portTICK_PERIOD_MS);
-      Serial.printf("[envoyTask] ligne %d Error : %d \n", __LINE__, error);
+      vTaskDelay(300 / portTICK_PERIOD_MS);
+       Serial.printf("[envoyTask] ligne %d fin tempo \n", __LINE__);
     } while (error == 0);
     cl->stop();
     cl->clearWriteError();
+    Serial.printf("[envoyTask] ligne %d Error : %d \n", __LINE__, error);
+
     // payload = https.getString();
     // Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
 
