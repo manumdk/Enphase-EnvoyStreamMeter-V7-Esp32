@@ -6,7 +6,6 @@
 #include "../config/enums.h"
 #include "../functions/serialFunction.h"
 
-extern Configwifi configwifi; 
 
 void serial_read_task(void * parameter){
   for (;;){

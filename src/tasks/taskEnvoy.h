@@ -3,20 +3,19 @@
 #include "../config/enums.h"
 #include "../functions/enphaseFunction.h"
 
-String SessionId;
 
 void envoyTask(void *parameter)
 {
   // delay(1000);
   vTaskDelay(5000 / portTICK_PERIOD_MS);
   String url;
-  if (String(configmodule.envoy) == "R")
+  if (String(envoy.type) == "R")
   {
     url = String(EnvoyR);
     Serial.print("[Enphase_get_7_Production] type R ");
     Serial.println(url);
   }
-  if (String(configmodule.envoy) == "S")
+  if (String(envoy.type) == "S")
   {
     url = String(EnvoyS);
     Serial.print("[Enphase_get_7_Production] type S ");

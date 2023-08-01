@@ -9,8 +9,10 @@
 extern Preferences prefWifi;
 extern Preferences prefEnvoy;
 extern Credentials credentials;
+extern Envoy envoy;
 
 
+bool bExit = false;
 
 bool serial_read()
 {

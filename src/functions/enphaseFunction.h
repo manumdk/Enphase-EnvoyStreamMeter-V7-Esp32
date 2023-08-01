@@ -62,6 +62,7 @@ bool Enphase_get_7_Stream(void)
   while (httpCode == 200)
   {
     String payload;
+
     WiFiClient *cl = https.getStreamPtr();
     int error = 0;
     do
@@ -74,13 +75,15 @@ bool Enphase_get_7_Stream(void)
 
     } while (error);
     cl->stop();
+    // payload = https.getString();
+    Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
     https.end();
 
     retour = true;
 #ifdef DEBUG
     Serial.printf("[envoyTask] ligne %d fin de la réception\n", __LINE__);
 #endif
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(4000 / portTICK_PERIOD_MS);
 
 #ifdef DEBUG
     Serial.printf("[envoyTask] ligne %d begin du https://", __LINE__);
@@ -152,14 +155,14 @@ bool Enphase_get_7_JWT(void)
       }
       else
       {
-            Serial.printf("[Enphase_get_7_JWT] ligne %d Enphase contrôle tocket : TOKEN INVALIDE !!! httpCode : %d \n", __LINE__, httpCode);
+        Serial.printf("[Enphase_get_7_JWT] ligne %d Enphase contrôle tocket : TOKEN INVALIDE !!! httpCode : %d \n", __LINE__, httpCode);
 
         https.end();
       }
     }
-    else{
-            Serial.printf("[Enphase_get_7_JWT] ligne %d Enphase contrôle tocket : ERROR !!! httpCode : %d -> %s \n", __LINE__, httpCode,  https.errorToString(httpCode));
-
+    else
+    {
+      Serial.printf("[Enphase_get_7_JWT] ligne %d Enphase contrôle tocket : ERROR !!! httpCode : %d -> %s \n", __LINE__, httpCode, https.errorToString(httpCode));
     }
   }
   https.end();
@@ -174,11 +177,10 @@ void Enphase_get_7(void)
   if (WiFi.isConnected())
   {
     // create an HTTPClient instance
-    // retour 
+    // retour
     if (SessionId.isEmpty() || Enphase_get_7_Stream() == false)
     { // Permet de lancer le contrôle du token une fois au démarrage (Empty SessionId)
-      
-      
+
       SessionId.clear();
       Serial.printf("[Enphase_get_7] Enphase version 7, token : -%s- \n", envoy.token.c_str());
       Enphase_get_7_JWT();
@@ -189,6 +191,5 @@ void Enphase_get_7(void)
     Serial.println("Enphase version 7 : ERROR");
   }
 }
-
 
 #endif

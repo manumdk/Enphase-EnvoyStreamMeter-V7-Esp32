@@ -46,12 +46,9 @@ Credentials credentials;
 Envoy envoy;
 
 const char *enphase_conf = "/enphase.json";
-bool bExit = false; // permet de gérer la sortie du menu
 
 //////////////////////////////////// récupération des valeurs
 
-HTTPClient https;
-String SessionId;
 
 //-------------------------------------------------------------------------------"
 
@@ -140,7 +137,7 @@ void setup()
     xTaskCreatePinnedToCore(
         envoyTask,
         "envoyTask",         // Task name
-        5000,                // Stack size (bytes)
+        10000,                // Stack size (bytes)
         NULL,                // Parameter
         5,                   // Task priority
         NULL,                // Task handle
