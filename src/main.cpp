@@ -23,7 +23,7 @@ At the first compilation plan to enter the credentials and the token
 Information is saved in flash
 */
 
-// #define DEBUG
+#define DEBUG
 // #ifdef DEBUG
 // #define serial_print(x) Serial.print(x)
 // #define serial.printf(x) Serial.printf(x)
@@ -309,7 +309,7 @@ bool Enphase_get_7_Stream(void)
 
   // Serial.println("Enphase Get production : https://" + adr + url);
 
-  Serial.printf("[envoyTask] ligne %d http://", __LINE__);
+  Serial.printf("[envoyTask] ligne %d https://", __LINE__);
   Serial.println(adr + url);
 
   if (https.begin("https://" + adr + url))
@@ -411,7 +411,6 @@ bool Enphase_get_7_JWT(void)
     const char *headerkeys[] = {"Set-Cookie"};
     https.collectHeaders(headerkeys, sizeof(headerkeys) / sizeof(char *));
     int httpCode = https.GET();
-    Serial.printf("[Enphase_get_7_JWT] ligne %d httpCode : %d \n", __LINE__, httpCode);
 
     // httpCode will be negative on error
     // Serial.println("Enphase_Get_7 : httpcode : " + httpCode);
@@ -421,15 +420,20 @@ bool Enphase_get_7_JWT(void)
       {
         retour = true;
         // Token valide
-        Serial.println("[Enphase_get_7_JWT] Enphase contrôle tocket : TOKEN VALIDE ");
+        Serial.printf("[Enphase_get_7_JWT] ligne %d Enphase contrôle tocket : TOKEN VALIDE httpCode : %d \n", __LINE__, httpCode);
         SessionId.clear();
         SessionId = https.header("Set-Cookie");
       }
       else
       {
-        Serial.println("[Enphase_get_7_JWT] Enphase contrôle tocket : TOKEN INVALIDE !!!");
+            Serial.printf("[Enphase_get_7_JWT] ligne %d Enphase contrôle tocket : TOKEN INVALIDE !!! httpCode : %d \n", __LINE__, httpCode);
+
         https.end();
       }
+    }
+    else{
+            Serial.printf("[Enphase_get_7_JWT] ligne %d Enphase contrôle tocket : ERROR !!! httpCode : %d -> %s \n", __LINE__, httpCode,  https.errorToString(httpCode));
+
     }
   }
   https.end();
@@ -444,10 +448,13 @@ void Enphase_get_7(void)
   if (WiFi.isConnected())
   {
     // create an HTTPClient instance
+    // retour 
     if (SessionId.isEmpty() || Enphase_get_7_Stream() == false)
     { // Permet de lancer le contrôle du token une fois au démarrage (Empty SessionId)
+      
+      
       SessionId.clear();
-      Serial.printf("[Enphase_get_7] Enphase version 7, token : %s \n", envoy.token.c_str());
+      Serial.printf("[Enphase_get_7] Enphase version 7, token : -%s- \n", envoy.token.c_str());
       Enphase_get_7_JWT();
     }
   }
@@ -542,5 +549,5 @@ void loop()
     Serial.println("WIFI_HS");
   }
   serial_read();
-  delay(2000);
+  delay(4000);
 }
