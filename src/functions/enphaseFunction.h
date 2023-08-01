@@ -62,27 +62,25 @@ bool Enphase_get_7_Stream(void)
   while (httpCode == 200)
   {
     String payload;
-
-    // WiFiClient *cl = https.getStreamPtr();
-    int error = 0;
-    // do
-    // {
-    //   cl->find("data: ");
-    //   payload = cl->readStringUntil('\n');
-    //   error = cl->getWriteError();
-    //   // cl->flush();
-    //   if (payload.length() > 5)
-    //     Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
-    //   // vTaskDelay(300 / portTICK_PERIOD_MS);
-    //   Serial.printf("[envoyTask] ligne %d Error : %d \n", __LINE__, error);
-    // } while (error);
-    // cl->stop();
-    // cl->clearWriteError();
-    // // payload = https.getString();
-    // // Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
            vTaskDelay(20 / portTICK_PERIOD_MS);
-    payload = https.getString();
-    Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
+    int error = 0;           
+    WiFiClient *cl = https.getStreamPtr();
+
+    do
+    {
+      cl->find("data: ");
+      payload = cl->readStringUntil('\n');
+      error = cl->getWriteError();
+      // cl->flush();
+      if (payload.length() > 5)
+        Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
+      // vTaskDelay(300 / portTICK_PERIOD_MS);
+      Serial.printf("[envoyTask] ligne %d Error : %d \n", __LINE__, error);
+    } while (error);
+    cl->stop();
+    cl->clearWriteError();
+    // payload = https.getString();
+    // Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
 
     https.end();
 
@@ -90,7 +88,7 @@ bool Enphase_get_7_Stream(void)
 #ifdef DEBUG
     Serial.printf("[envoyTask] ligne %d fin de la réception\n", __LINE__);
 #endif
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(500 / portTICK_PERIOD_MS);
 
 #ifdef DEBUG
     Serial.printf("[envoyTask] ligne %d begin du https://", __LINE__);

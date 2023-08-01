@@ -202,7 +202,7 @@ void menu_setup()
   long now = millis();
   while (!bExit)
   {
-    if (millis() - now > 10000)
+    if (millis() - now > 3000)
     {
       bExit = true;
     }
