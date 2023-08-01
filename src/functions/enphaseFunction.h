@@ -62,8 +62,8 @@ bool Enphase_get_7_Stream(void)
   while (httpCode == 200)
   {
     String payload;
-           vTaskDelay(20 / portTICK_PERIOD_MS);
-    int error = 0;           
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+    int error = 0;
     WiFiClient *cl = https.getStreamPtr();
 
     do
@@ -76,7 +76,7 @@ bool Enphase_get_7_Stream(void)
         Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
       // vTaskDelay(300 / portTICK_PERIOD_MS);
       Serial.printf("[envoyTask] ligne %d Error : %d \n", __LINE__, error);
-    } while (error);
+    } while (error == 0);
     cl->stop();
     cl->clearWriteError();
     // payload = https.getString();
