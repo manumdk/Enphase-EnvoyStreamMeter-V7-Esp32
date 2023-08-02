@@ -2,6 +2,7 @@
 #include "../config/config.h"
 #include "../config/enums.h"
 #include "../functions/enphaseFunction.h"
+#include "../functions/enphaseAuthentification.h"
 
 void envoyTask(void *parameter)
 {
@@ -30,11 +31,12 @@ void envoyTask(void *parameter)
     vTaskDelay(5000 / portTICK_PERIOD_MS);
     Serial.println("[envoyTask] Pas de connection Wifi ");
   }
+  setup_Auth();
   Serial.println("[envoyTask] Début boucle Envoy");
   for (;;)
   {
     // String payload;
-    Enphase_get_7();
+    //Enphase_get_7();
     vTaskDelay(4000 / portTICK_PERIOD_MS);
   }
 }

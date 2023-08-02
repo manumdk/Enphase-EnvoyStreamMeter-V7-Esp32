@@ -16,7 +16,7 @@ enum DEVICE_STATE
   AP_MODE,
 };
 
-bool bLog = false;
+bool bLog = true;
 struct Credentials
 {
   String ssid;
