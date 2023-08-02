@@ -65,18 +65,29 @@ bool Enphase_get_7_Stream(void)
     vTaskDelay(200 / portTICK_PERIOD_MS);
     int error = 0;
     WiFiClient *cl = https.getStreamPtr();
-
+    int compteur = 10;
     do
     {
       cl->find("data: ");
       payload = cl->readStringUntil('\n');
       error = cl->getWriteError();
       // cl->flush();
-      if (payload.length() > 5)
+      if (payload.length() > 10)
+      {
+        if (bLog || compteur == 10)
+        {
+          Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
+          compteur = 0;
+        }
+      }
+      else
+      {
         Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
-        int retError = processingJsondata(payload);
+      }
+      int retError = processingJsondata(payload);
       vTaskDelay(300 / portTICK_PERIOD_MS);
-       Serial.printf("[envoyTask] ligne %d fin tempo \n", __LINE__);
+      compteur++;
+
     } while (error == 0);
     cl->stop();
     cl->clearWriteError();

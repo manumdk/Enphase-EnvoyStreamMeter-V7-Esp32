@@ -153,6 +153,21 @@ bool serial_read()
       prefEnvoy.end();
       return true;
     }
+    index = message_get.indexOf("LOG");
+    if (index != -1)
+    {
+      Serial.println("Activation Log série" );
+      bLog = true;
+      return false;
+    }
+        index = message_get.indexOf("log");
+    if (index != -1)
+    {
+      Serial.println("Stop Log série" );
+      bLog = false;
+      return false;
+    }
+
     index = message_get.indexOf("quit");
     if (index != -1)
     {

@@ -17,6 +17,29 @@ String SerialNumber(int index);
 //It's quick and easy but all these variables shouldn't be public. It's a pain to provider getters for each one but that would
 //prevent accidental modification of these variables. Or, the developer can be careful not to make a mistake. Those never happen!
 
+enum Phase{
+    pha,
+    phb,
+    phc
+};
+
+struct MesurePhase {
+    double p[3];
+    double q[3];
+    double s[3];
+    double v[3];
+    double i[3];
+    double pf[3];
+    double f[3];
+};
+
+struct DataEnvoy{
+MesurePhase Prod;
+MesurePhase Net;
+MesurePhase Conso;
+};
+
+
 //stream/meter variables
 double Apower;
 double Avoltage;
@@ -60,17 +83,17 @@ double InvTotalMaxPower = 0;
 int numInverters;
 IPAddress envoyIP;
 
-String extractParam(String &authReq, const String &param, const char delimit);
-String getCNonce(const int len);
-String getDigestAuth(String &authReq, const String &username, const String &password, const String &uri, unsigned int counter);
-String serverString;
-String authorizationMeter;
+// String extractParam(String &authReq, const String &param, const char delimit);
+// String getCNonce(const int len);
+// String getDigestAuth(String &authReq, const String &username, const String &password, const String &uri, unsigned int counter);
+// String serverString;
+// String authorizationMeter;
 
-char installerPassword[20];
-char envoyName[20] = "envoy";       //the .local is automatically added so basically never explicitly do so anywhere.
-                                    //In multiple Envoy systems this would be envoy, envoy2, envoy3, etc.
-const char *username = "installer"; //login is always installer
-IPAddress IP_envoy = IPAddress(192, 168, 10, 179); // A déclarer si pb de DNS local sinon 0.0.0.0
+// char installerPassword[20];
+// char envoyName[20] = "envoy";       //the .local is automatically added so basically never explicitly do so anywhere.
+//                                     //In multiple Envoy systems this would be envoy, envoy2, envoy3, etc.
+// const char *username = "installer"; //login is always installer
+// IPAddress IP_envoy = IPAddress(192, 168, 10, 179); // A déclarer si pb de DNS local sinon 0.0.0.0
 float AReal_power = 0;
 float AReactive_power = 0;
 float AApparent_power = 0;

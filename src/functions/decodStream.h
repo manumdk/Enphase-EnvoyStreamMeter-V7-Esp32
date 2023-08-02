@@ -8,242 +8,390 @@
 #include "../config/enums.h"
 #include "../config/config-Stream.h"
 
-
+DataEnvoy dataEnvoy;
+enum Phase ph;
 // JSon routines
 
 // Routine de gestion et impression des donnes JSON
 
-int processingJsondata(String payload) {
+int processingJsondata(String payload)
+{
 
-DynamicJsonDocument doc(2000);          // Added from envoy exemple
-     
-// Deserialize the JSON document
-  DeserializationError error = deserializeJson(doc, payload);
-      
-  // Test if parsing does not succeeds.
-  if (error!=DeserializationError::Ok) {
-    DEBUG_SERIAL.print(F("deserializeJson() failed: "));
-    DEBUG_SERIAL.println(error.f_str());
-    return 0;
-  }
+    DynamicJsonDocument doc(2000); // Added from envoy exemple
 
-   JsonObject obj = doc.as<JsonObject>();
+    // Deserialize the JSON document
+    DeserializationError error = deserializeJson(doc, payload);
 
-      if (obj.containsKey("production"))
-      {
-          if (obj["production"].containsKey("ph-a"))
-          {
-              AReal_power = obj["production"]["ph-a"]["p"]; 
-              AReactive_power = obj["production"]["ph-a"]["q"];  
-              AApparent_power = obj["production"]["ph-a"]["s"];
-              Avoltage = obj["production"]["ph-a"]["v"];
-              Acurrent = obj["production"]["ph-a"]["i"];
-              pf = obj["production"]["ph-a"]["pf"];
-              freq = obj["production"]["ph-a"]["f"];
-              
-                  DEBUG_SERIAL.print("\nPhase A - ");
-                  DEBUG_SERIAL.print("Real Power: ");
-                  DEBUG_SERIAL.print(AReal_power);
-                  DEBUG_SERIAL.print("\tReact Power: ");
-                  DEBUG_SERIAL.print(AReactive_power);
-                  DEBUG_SERIAL.print("\tApparent Power: ");
-                  DEBUG_SERIAL.print(AApparent_power);
-                  DEBUG_SERIAL.print("\tVoltage: ");
-                  DEBUG_SERIAL.print(Avoltage);
-                  DEBUG_SERIAL.print("\tCurrent: ");
-                  DEBUG_SERIAL.print(Acurrent);  
-                  DEBUG_SERIAL.print("\tPower Factor: ");
-                  DEBUG_SERIAL.print(pf);  
-                  DEBUG_SERIAL.print("\tFrequency: ");
-                  DEBUG_SERIAL.println(freq);
-          }
-          if (obj["production"].containsKey("ph-b"))
-          {
-              BReal_power = obj["production"]["ph-b"]["p"]; 
-              BReactive_power = obj["production"]["ph-b"]["q"];  
-              BApparent_power = obj["production"]["ph-b"]["s"];
-              Bvoltage = obj["production"]["ph-b"]["v"];
-              Bcurrent = obj["production"]["ph-b"]["i"];
-              pf = obj["production"]["ph-b"]["pf"];
-              freq = obj["production"]["ph-b"]["f"];
-              
-              if (Bvoltage>0) {
-                
-                  DEBUG_SERIAL.print("Phase B - ");
-                  DEBUG_SERIAL.print("Real Power: ");
-                  DEBUG_SERIAL.print(BReal_power);
-                  DEBUG_SERIAL.print("\tReact Power: ");
-                  DEBUG_SERIAL.print(BReactive_power);
-                  DEBUG_SERIAL.print("\tApparent Power: ");
-                  DEBUG_SERIAL.print(BApparent_power);
-                  DEBUG_SERIAL.print("\tVoltage: ");
-                  DEBUG_SERIAL.print(Bvoltage);
-                  DEBUG_SERIAL.print("\tCurrent: ");
-                  DEBUG_SERIAL.print(Bcurrent);  
-                  DEBUG_SERIAL.print("\tPower Factor: ");
-                  DEBUG_SERIAL.print(pf);  
-                  DEBUG_SERIAL.print("\tFrequency: ");
-                  DEBUG_SERIAL.println(freq);
-              }
-              else DEBUG_SERIAL.println("Phase B non connectée");
-              
-          }
-          if (obj["production"].containsKey("ph-c"))
-          {
-              CReal_power = obj["production"]["ph-c"]["p"]; 
-              CReactive_power = obj["production"]["ph-c"]["q"];  
-              CApparent_power = obj["production"]["ph-c"]["s"];
-              Cvoltage = obj["production"]["ph-c"]["v"];
-              Ccurrent = obj["production"]["ph-c"]["i"];
-              pf = obj["production"]["ph-c"]["pf"];
-              freq = obj["production"]["ph-c"]["f"];
-              
-              if (Cvoltage >0)  {
-                  DEBUG_SERIAL.print("Phase C - ");
-                  DEBUG_SERIAL.print("Real Power: ");
-                  DEBUG_SERIAL.print(CReal_power);
-                  DEBUG_SERIAL.print("\tReact Power: ");
-                  DEBUG_SERIAL.print(CReactive_power);
-                  DEBUG_SERIAL.print("\tApparent Power: ");
-                  DEBUG_SERIAL.print(CApparent_power);
-                  DEBUG_SERIAL.print("\tVoltage: ");
-                  DEBUG_SERIAL.print(Cvoltage);
-                  DEBUG_SERIAL.print("\tCurrent: ");
-                  DEBUG_SERIAL.print(Ccurrent);  
-                  DEBUG_SERIAL.print("\tPower Factor: ");
-                  DEBUG_SERIAL.print(pf);  
-                  DEBUG_SERIAL.print("\tFrequency: ");
-                  DEBUG_SERIAL.println(freq);
-              }
-              else DEBUG_SERIAL.println("Phase C non connectée");
-              
-          }
-          
-          Power = AReal_power+BReal_power+CReal_power;
-                        
-              DEBUG_SERIAL.print("\n  Power Produced:");
-              DEBUG_SERIAL.print(Power);
-              DEBUG_SERIAL.print("\tCurrent: ");
-              DEBUG_SERIAL.print((Acurrent+Bcurrent+Ccurrent));
-              DEBUG_SERIAL.print("\tPowerFactor:");
-              DEBUG_SERIAL.print(pf);
-              DEBUG_SERIAL.print("\tFrequency:");
-              DEBUG_SERIAL.print(freq);
-              DEBUG_SERIAL.println();
-          
-      } else {
-             DEBUG_SERIAL.println("No production data");
-             return 0;
-        }
-
-      if (obj.containsKey("total-consumption"))
-      {
-          if (obj["total-consumption"].containsKey("ph-a"))
-          {
-              tcAReal_power = obj["total-consumption"]["ph-a"]["p"]; 
-              tcAReactive_power = obj["total-consumption"]["ph-a"]["q"];  
-              tcAApparent_power = obj["total-consumption"]["ph-a"]["s"];
-              tcAvoltage = obj["total-consumption"]["ph-a"]["v"];
-              tcAcurrent = obj["total-consumption"]["ph-a"]["i"];
-              pf = obj["total-consumption"]["ph-a"]["pf"];
-              freq = obj["total-consumption"]["ph-a"]["f"];
-              
-                  DEBUG_SERIAL.print("\nPhase A - ");
-                  DEBUG_SERIAL.print("Real Power: ");
-                  DEBUG_SERIAL.print(tcAReal_power);
-                  DEBUG_SERIAL.print("\tReact Power: ");
-                  DEBUG_SERIAL.print(tcAReactive_power);
-                  DEBUG_SERIAL.print("\tApparent Power: ");
-                  DEBUG_SERIAL.print(tcAApparent_power);
-                  DEBUG_SERIAL.print("\tVoltage: ");
-                  DEBUG_SERIAL.print(tcAvoltage);
-                  DEBUG_SERIAL.print("\tCurrent: ");
-                  DEBUG_SERIAL.print(tcAcurrent);  
-                  DEBUG_SERIAL.print("\tPower Factor: ");
-                  DEBUG_SERIAL.print(pf);  
-                  DEBUG_SERIAL.print("\tFrequency: ");
-                  DEBUG_SERIAL.println(freq);
-              
-          }
-          if (obj["total-consumption"].containsKey("ph-b"))
-          {
-              tcBReal_power = obj["total-consumption"]["ph-b"]["p"]; 
-              tcBReactive_power = obj["total-consumption"]["ph-b"]["q"];  
-              tcBApparent_power = obj["total-consumption"]["ph-b"]["s"];
-              tcBvoltage = obj["total-consumption"]["ph-b"]["v"];
-              tcBcurrent = obj["total-consumption"]["ph-b"]["i"];
-              pf = obj["total-consumption"]["ph-b"]["pf"];
-              freq = obj["total-consumption"]["ph-b"]["f"];
-              
-              if (tcBvoltage > 0) {
-                  DEBUG_SERIAL.print("Phase B - ");
-                  DEBUG_SERIAL.print("Real Power: ");
-                  DEBUG_SERIAL.print(tcBReal_power);
-                  DEBUG_SERIAL.print("\tReact Power: ");
-                  DEBUG_SERIAL.print(tcBReactive_power);
-                  DEBUG_SERIAL.print("\tApparent Power: ");
-                  DEBUG_SERIAL.print(tcBApparent_power);
-                  DEBUG_SERIAL.print("\tVoltage: ");
-                  DEBUG_SERIAL.print(tcBvoltage);
-                  DEBUG_SERIAL.print("\tCurrent: ");
-                  DEBUG_SERIAL.print(tcBcurrent);  
-                  DEBUG_SERIAL.print("\tPower Factor: ");
-                  DEBUG_SERIAL.print(pf);  
-                  DEBUG_SERIAL.print("\tFrequency: ");
-                  DEBUG_SERIAL.println(freq);
-              }
-              else DEBUG_SERIAL.println("Phase B non connectée");
-              
-          }
-          if (obj["total-consumption"].containsKey("ph-c"))
-          {
-              tcCReal_power = obj["total-consumption"]["ph-c"]["p"]; 
-              tcCReactive_power = obj["total-consumption"]["ph-c"]["q"];  
-              tcCApparent_power = obj["total-consumption"]["ph-c"]["s"];
-              tcCvoltage = obj["total-consumption"]["ph-c"]["v"];
-              tcCcurrent = obj["total-consumption"]["ph-c"]["i"];
-              pf = obj["total-consumption"]["ph-c"]["pf"];
-              freq = obj["total-consumption"]["ph-c"]["f"];
-              
-              if (tcCvoltage >0) {
-                  DEBUG_SERIAL.print("Phase C - ");
-                  DEBUG_SERIAL.print("Real Power: ");
-                  DEBUG_SERIAL.print(tcCReal_power);
-                  DEBUG_SERIAL.print("\tReact Power: ");
-                  DEBUG_SERIAL.print(tcCReactive_power);
-                  DEBUG_SERIAL.print("\tApparent Power: ");
-                  DEBUG_SERIAL.print(tcCApparent_power);
-                  DEBUG_SERIAL.print("\tVoltage: ");
-                  DEBUG_SERIAL.print(tcCvoltage);
-                  DEBUG_SERIAL.print("\tCurrent: ");
-                  DEBUG_SERIAL.print(tcCcurrent);  
-                  DEBUG_SERIAL.print("\tPower Factor: ");
-                  DEBUG_SERIAL.print(pf);  
-                  DEBUG_SERIAL.print("\tFrequency: ");
-                  DEBUG_SERIAL.println(freq);
-              }
-              else DEBUG_SERIAL.println("Phase C non connectée");
-              
-          }
-          
-            tcAReal_power *= -1;
-            tcBReal_power *= -1;
-            tcCReal_power *= -1;
-            Consumption= tcAReal_power + tcBReal_power + tcCReal_power;
-            NetPower=Power+Consumption;
-                    
-              DEBUG_SERIAL.print("  Power Consumed: \t");
-              DEBUG_SERIAL.println(Consumption);
-              DEBUG_SERIAL.print("\t\t Net Power: \t");
-              DEBUG_SERIAL.println(Power + Consumption);
-              DEBUG_SERIAL.println();                      
-          
-      }
-      else {
-        DEBUG_SERIAL.println("No Consumption Data");
+    // Test if parsing does not succeeds.
+    if (error != DeserializationError::Ok)
+    {
+        DEBUG_SERIAL.print(F("*************** deserializeJson() failed: "));
+        DEBUG_SERIAL.println(error.f_str());
+        DEBUG_SERIAL.printf("message recu, lg %i, message : %s \n",payload.length(), payload);
         return 0;
+    }
+
+    JsonObject obj = doc.as<JsonObject>();
+    int numPh = 0;
+    if (obj.containsKey("production"))
+    {
+        if (obj["production"].containsKey("ph-a"))
+        {
+            dataEnvoy.Prod.p[pha] = obj["production"]["ph-a"]["p"];
+            dataEnvoy.Prod.q[pha] = obj["production"]["ph-a"]["q"];
+            dataEnvoy.Prod.s[pha] = obj["production"]["ph-a"]["s"];
+            dataEnvoy.Prod.v[pha] = obj["production"]["ph-a"]["v"];
+            dataEnvoy.Prod.i[pha] = obj["production"]["ph-a"]["i"];
+            dataEnvoy.Prod.pf[pha] = obj["production"]["ph-a"]["pf"];
+            dataEnvoy.Prod.f[pha] = obj["production"]["ph-a"]["f"];
+            if (bLog)
+            {
+                DEBUG_SERIAL.print("\nPhase B - ");
+                DEBUG_SERIAL.print("Real Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.p[pha]);
+                DEBUG_SERIAL.print("\tReact Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.q[pha]);
+                DEBUG_SERIAL.print("\tApparent Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.s[pha]);
+                DEBUG_SERIAL.print("\tVoltage: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.v[pha]);
+                DEBUG_SERIAL.print("\tCurrent: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.i[pha]);
+                DEBUG_SERIAL.print("\tPower Factor: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.pf[pha]);
+                DEBUG_SERIAL.print("\tFrequency: ");
+                DEBUG_SERIAL.println(dataEnvoy.Prod.f[pha]);
+            }
         }
-  return 1;
- }
+        if (obj["production"].containsKey("ph-b"))
+        {
+            dataEnvoy.Prod.p[phb] = obj["production"]["ph-b"]["p"];
+            dataEnvoy.Prod.q[phb] = obj["production"]["ph-b"]["q"];
+            dataEnvoy.Prod.s[phb] = obj["production"]["ph-b"]["s"];
+            dataEnvoy.Prod.v[phb] = obj["production"]["ph-b"]["v"];
+            dataEnvoy.Prod.i[phb] = obj["production"]["ph-b"]["i"];
+            dataEnvoy.Prod.pf[phb] = obj["production"]["ph-b"]["pf"];
+            dataEnvoy.Prod.f[phb] = obj["production"]["ph-b"]["f"];
+
+            if (dataEnvoy.Prod.v[phb] > 0 && bLog)
+            {
+
+                DEBUG_SERIAL.print("\nPhase A - ");
+                DEBUG_SERIAL.print("Real Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.p[phb]);
+                DEBUG_SERIAL.print("\tReact Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.q[phb]);
+                DEBUG_SERIAL.print("\tApparent Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.s[phb]);
+                DEBUG_SERIAL.print("\tVoltage: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.v[phb]);
+                DEBUG_SERIAL.print("\tCurrent: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.i[phb]);
+                DEBUG_SERIAL.print("\tPower Factor: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.pf[phb]);
+                DEBUG_SERIAL.print("\tFrequency: ");
+                DEBUG_SERIAL.println(dataEnvoy.Prod.f[phb]);
+            }
+        }
+        else if (bLog)
+        {
+            DEBUG_SERIAL.println("Phase B non connectée");
+        }
+        if (obj["production"].containsKey("ph-c"))
+        {
+            dataEnvoy.Prod.p[phc] = obj["production"]["ph-c"]["p"];
+            dataEnvoy.Prod.q[phc] = obj["production"]["ph-c"]["q"];
+            dataEnvoy.Prod.s[phc] = obj["production"]["ph-c"]["s"];
+            dataEnvoy.Prod.v[phc] = obj["production"]["ph-c"]["v"];
+            dataEnvoy.Prod.i[phc] = obj["production"]["ph-c"]["i"];
+            dataEnvoy.Prod.pf[phc] = obj["production"]["ph-c"]["pf"];
+            dataEnvoy.Prod.f[phc] = obj["production"]["ph-c"]["f"];
+
+            if (dataEnvoy.Prod.v[phc] > 0 && bLog)
+            {
+
+                DEBUG_SERIAL.print("\nPhase C - ");
+                DEBUG_SERIAL.print("Real Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.p[phc]);
+                DEBUG_SERIAL.print("\tReact Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.q[phc]);
+                DEBUG_SERIAL.print("\tApparent Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.s[phc]);
+                DEBUG_SERIAL.print("\tVoltage: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.v[phc]);
+                DEBUG_SERIAL.print("\tCurrent: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.i[phc]);
+                DEBUG_SERIAL.print("\tPower Factor: ");
+                DEBUG_SERIAL.print(dataEnvoy.Prod.pf[phc]);
+                DEBUG_SERIAL.print("\tFrequency: ");
+                DEBUG_SERIAL.println(dataEnvoy.Prod.f[phc]);
+            }
+        }
+        else if (bLog)
+        {
+            DEBUG_SERIAL.println("Phase C non connectée");
+        }
+
+        if (bLog)
+        {
+            DEBUG_SERIAL.print("\n  Power Produced:");
+            DEBUG_SERIAL.print(dataEnvoy.Prod.p[pha] + dataEnvoy.Prod.p[pha] + dataEnvoy.Prod.p[phc]);
+            DEBUG_SERIAL.print("\tCurrent: ");
+            DEBUG_SERIAL.print(dataEnvoy.Prod.i[pha] + dataEnvoy.Prod.i[pha] + dataEnvoy.Prod.i[phc]);
+            DEBUG_SERIAL.print("\tPowerFactor:");
+            DEBUG_SERIAL.print(dataEnvoy.Prod.pf[pha]);
+            DEBUG_SERIAL.print("\tFrequency:");
+            DEBUG_SERIAL.print(dataEnvoy.Prod.f[pha]);
+            DEBUG_SERIAL.println();
+        }
+    }
+
+    else if (bLog)
+
+    {
+        DEBUG_SERIAL.println("No production data");
+        return 0;
+    }
+
+    if (obj.containsKey("net-consumption"))
+    {
+        if (obj["net-consumption"].containsKey("ph-a"))
+        {
+            dataEnvoy.Net.p[pha] = obj["net-consumption"]["ph-a"]["p"];
+            dataEnvoy.Net.q[pha] = obj["net-consumption"]["ph-a"]["q"];
+            dataEnvoy.Net.s[pha] = obj["net-consumption"]["ph-a"]["s"];
+            dataEnvoy.Net.v[pha] = obj["net-consumption"]["ph-a"]["v"];
+            dataEnvoy.Net.i[pha] = obj["net-consumption"]["ph-a"]["i"];
+            dataEnvoy.Net.pf[pha] = obj["net-consumption"]["ph-a"]["pf"];
+            dataEnvoy.Net.f[pha] = obj["net-consumption"]["ph-a"]["f"];
+            if (bLog)
+            {
+                DEBUG_SERIAL.print("\nPhase B - ");
+                DEBUG_SERIAL.print("Real Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.p[pha]);
+                DEBUG_SERIAL.print("\tReact Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.q[pha]);
+                DEBUG_SERIAL.print("\tApparent Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.s[pha]);
+                DEBUG_SERIAL.print("\tVoltage: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.v[pha]);
+                DEBUG_SERIAL.print("\tCurrent: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.i[pha]);
+                DEBUG_SERIAL.print("\tPower Factor: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.pf[pha]);
+                DEBUG_SERIAL.print("\tFrequency: ");
+                DEBUG_SERIAL.println(dataEnvoy.Net.f[pha]);
+            }
+        }
+        if (obj["net-consumption"].containsKey("ph-b"))
+        {
+            dataEnvoy.Net.p[phb] = obj["net-consumption"]["ph-b"]["p"];
+            dataEnvoy.Net.q[phb] = obj["net-consumption"]["ph-b"]["q"];
+            dataEnvoy.Net.s[phb] = obj["net-consumption"]["ph-b"]["s"];
+            dataEnvoy.Net.v[phb] = obj["net-consumption"]["ph-b"]["v"];
+            dataEnvoy.Net.i[phb] = obj["net-consumption"]["ph-b"]["i"];
+            dataEnvoy.Net.pf[phb] = obj["net-consumption"]["ph-b"]["pf"];
+            dataEnvoy.Net.f[phb] = obj["net-consumption"]["ph-b"]["f"];
+
+            if (dataEnvoy.Net.v[phb] > 0 && bLog)
+            {
+                DEBUG_SERIAL.print("\nPhase A - ");
+                DEBUG_SERIAL.print("Real Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.p[phb]);
+                DEBUG_SERIAL.print("\tReact Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.q[phb]);
+                DEBUG_SERIAL.print("\tApparent Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.s[phb]);
+                DEBUG_SERIAL.print("\tVoltage: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.v[phb]);
+                DEBUG_SERIAL.print("\tCurrent: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.i[phb]);
+                DEBUG_SERIAL.print("\tPower Factor: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.pf[phb]);
+                DEBUG_SERIAL.print("\tFrequency: ");
+                DEBUG_SERIAL.println(dataEnvoy.Net.f[phb]);
+            }
+        }
+        else if (bLog)
+        {
+            DEBUG_SERIAL.println("Phase B non connectée");
+        }
+        if (obj["net-consumption"].containsKey("ph-c"))
+        {
+            dataEnvoy.Net.p[phc] = obj["net-consumption"]["ph-c"]["p"];
+            dataEnvoy.Net.q[phc] = obj["net-consumption"]["ph-c"]["q"];
+            dataEnvoy.Net.s[phc] = obj["net-consumption"]["ph-c"]["s"];
+            dataEnvoy.Net.v[phc] = obj["net-consumption"]["ph-c"]["v"];
+            dataEnvoy.Net.i[phc] = obj["net-consumption"]["ph-c"]["i"];
+            dataEnvoy.Net.pf[phc] = obj["net-consumption"]["ph-c"]["pf"];
+            dataEnvoy.Net.f[phc] = obj["net-consumption"]["ph-c"]["f"];
+
+            if (dataEnvoy.Net.v[phc] > 0 && bLog)
+            {
+
+                DEBUG_SERIAL.print("\nPhase C - ");
+                DEBUG_SERIAL.print("Real Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.p[phc]);
+                DEBUG_SERIAL.print("\tReact Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.q[phc]);
+                DEBUG_SERIAL.print("\tApparent Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.s[phc]);
+                DEBUG_SERIAL.print("\tVoltage: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.v[phc]);
+                DEBUG_SERIAL.print("\tCurrent: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.i[phc]);
+                DEBUG_SERIAL.print("\tPower Factor: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.pf[phc]);
+                DEBUG_SERIAL.print("\tFrequency: ");
+                DEBUG_SERIAL.println(dataEnvoy.Net.f[phc]);
+            }
+        }
+        else if (bLog)
+        {
+            DEBUG_SERIAL.println("Phase C non connectée");
+        }
+        if (bLog)
+        {
+            DEBUG_SERIAL.print("\n  Power Produced:");
+            DEBUG_SERIAL.print(dataEnvoy.Net.p[pha] + dataEnvoy.Net.p[pha] + dataEnvoy.Net.p[phc]);
+            DEBUG_SERIAL.print("\tCurrent: ");
+            DEBUG_SERIAL.print(dataEnvoy.Net.i[pha] + dataEnvoy.Net.i[pha] + dataEnvoy.Net.i[phc]);
+            DEBUG_SERIAL.print("\tPowerFactor:");
+            DEBUG_SERIAL.print(dataEnvoy.Net.pf[pha]);
+            DEBUG_SERIAL.print("\tFrequency:");
+            DEBUG_SERIAL.print(dataEnvoy.Net.f[pha]);
+            DEBUG_SERIAL.println();
+        }
+    }
+
+    else if (bLog)
+
+    {
+        DEBUG_SERIAL.println("No net-consumption data");
+        return 0;
+    }
+    if (obj.containsKey("total-consumption"))
+    {
+        if (obj["total-consumption"].containsKey("ph-a"))
+        {
+            dataEnvoy.Net.p[pha] = obj["total-consumption"]["ph-a"]["p"];
+            dataEnvoy.Net.q[pha] = obj["total-consumption"]["ph-a"]["q"];
+            dataEnvoy.Net.s[pha] = obj["total-consumption"]["ph-a"]["s"];
+            dataEnvoy.Net.v[pha] = obj["total-consumption"]["ph-a"]["v"];
+            dataEnvoy.Net.i[pha] = obj["total-consumption"]["ph-a"]["i"];
+            dataEnvoy.Net.pf[pha] = obj["total-consumption"]["ph-a"]["pf"];
+            dataEnvoy.Net.f[pha] = obj["total-consumption"]["ph-a"]["f"];
+            if (bLog)
+            {
+                DEBUG_SERIAL.print("\nPhase B - ");
+                DEBUG_SERIAL.print("Real Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.p[pha]);
+                DEBUG_SERIAL.print("\tReact Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.q[pha]);
+                DEBUG_SERIAL.print("\tApparent Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.s[pha]);
+                DEBUG_SERIAL.print("\tVoltage: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.v[pha]);
+                DEBUG_SERIAL.print("\tCurrent: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.i[pha]);
+                DEBUG_SERIAL.print("\tPower Factor: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.pf[pha]);
+                DEBUG_SERIAL.print("\tFrequency: ");
+                DEBUG_SERIAL.println(dataEnvoy.Net.f[pha]);
+            }
+        }
+        if (obj["total-consumption"].containsKey("ph-b"))
+        {
+            dataEnvoy.Net.p[phb] = obj["total-consumption"]["ph-b"]["p"];
+            dataEnvoy.Net.q[phb] = obj["total-consumption"]["ph-b"]["q"];
+            dataEnvoy.Net.s[phb] = obj["total-consumption"]["ph-b"]["s"];
+            dataEnvoy.Net.v[phb] = obj["total-consumption"]["ph-b"]["v"];
+            dataEnvoy.Net.i[phb] = obj["total-consumption"]["ph-b"]["i"];
+            dataEnvoy.Net.pf[phb] = obj["total-consumption"]["ph-b"]["pf"];
+            dataEnvoy.Net.f[phb] = obj["total-consumption"]["ph-b"]["f"];
+
+            if (dataEnvoy.Net.v[phb] > 0 && bLog)
+            {
+
+                DEBUG_SERIAL.print("\nPhase A - ");
+                DEBUG_SERIAL.print("Real Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.p[phb]);
+                DEBUG_SERIAL.print("\tReact Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.q[phb]);
+                DEBUG_SERIAL.print("\tApparent Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.s[phb]);
+                DEBUG_SERIAL.print("\tVoltage: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.v[phb]);
+                DEBUG_SERIAL.print("\tCurrent: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.i[phb]);
+                DEBUG_SERIAL.print("\tPower Factor: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.pf[phb]);
+                DEBUG_SERIAL.print("\tFrequency: ");
+                DEBUG_SERIAL.println(dataEnvoy.Net.f[phb]);
+            }
+        }
+        else if (bLog)
+        {
+            DEBUG_SERIAL.println("Phase B non connectée");
+        }
+        if (obj["total-consumption"].containsKey("ph-c"))
+        {
+            dataEnvoy.Net.p[phc] = obj["total-consumption"]["ph-c"]["p"];
+            dataEnvoy.Net.q[phc] = obj["total-consumption"]["ph-c"]["q"];
+            dataEnvoy.Net.s[phc] = obj["total-consumption"]["ph-c"]["s"];
+            dataEnvoy.Net.v[phc] = obj["total-consumption"]["ph-c"]["v"];
+            dataEnvoy.Net.i[phc] = obj["total-consumption"]["ph-c"]["i"];
+            dataEnvoy.Net.pf[phc] = obj["total-consumption"]["ph-c"]["pf"];
+            dataEnvoy.Net.f[phc] = obj["total-consumption"]["ph-c"]["f"];
+
+            if (dataEnvoy.Net.v[phc] > 0 && bLog)
+            {
+
+                DEBUG_SERIAL.print("\nPhase C - ");
+                DEBUG_SERIAL.print("Real Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.p[phc]);
+                DEBUG_SERIAL.print("\tReact Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.q[phc]);
+                DEBUG_SERIAL.print("\tApparent Power: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.s[phc]);
+                DEBUG_SERIAL.print("\tVoltage: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.v[phc]);
+                DEBUG_SERIAL.print("\tCurrent: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.i[phc]);
+                DEBUG_SERIAL.print("\tPower Factor: ");
+                DEBUG_SERIAL.print(dataEnvoy.Net.pf[phc]);
+                DEBUG_SERIAL.print("\tFrequency: ");
+                DEBUG_SERIAL.println(dataEnvoy.Net.f[phc]);
+            }
+        }
+        else if (bLog)
+        {
+            DEBUG_SERIAL.println("Phase C non connectée");
+        }
+
+        if (bLog)
+        {
+            DEBUG_SERIAL.print("\n  Power Produced:");
+            DEBUG_SERIAL.print(dataEnvoy.Net.p[pha] + dataEnvoy.Net.p[phb] + dataEnvoy.Net.p[phc]);
+            DEBUG_SERIAL.print("\tCurrent: ");
+            DEBUG_SERIAL.print(dataEnvoy.Net.i[pha] + dataEnvoy.Net.i[phb] + dataEnvoy.Net.i[phc]);
+            DEBUG_SERIAL.print("\tPowerFactor:");
+            DEBUG_SERIAL.print(dataEnvoy.Net.pf[pha]);
+            DEBUG_SERIAL.print("\tFrequency:");
+            DEBUG_SERIAL.print(dataEnvoy.Net.f[pha]);
+            DEBUG_SERIAL.println();
+        }
+    }
+
+    else
+    {
+        if (bLog)
+        {
+            DEBUG_SERIAL.println("No total-consumption data");
+            return 0;
+        }
+    }
+    return 1;
+}
 
 #endif
