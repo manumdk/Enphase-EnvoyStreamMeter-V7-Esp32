@@ -5,11 +5,12 @@
 #include "../config/config.h"
 #include "../config/enums.h"
 #include <HTTPClient.h>
+#include "../functions/decodStream.h"
 
 // extern Preferences prefWifi;
 // extern Preferences prefEnvoy;
 extern Envoy envoy;
-
+String payload;
 String SessionId;
 HTTPClient https;
 
@@ -61,7 +62,6 @@ bool Enphase_get_7_Stream(void)
   // while (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
   while (httpCode == 200)
   {
-    String payload;
     vTaskDelay(200 / portTICK_PERIOD_MS);
     int error = 0;
     WiFiClient *cl = https.getStreamPtr();
@@ -74,6 +74,7 @@ bool Enphase_get_7_Stream(void)
       // cl->flush();
       if (payload.length() > 5)
         Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
+        int retError = processingJsondata(payload);
       vTaskDelay(300 / portTICK_PERIOD_MS);
        Serial.printf("[envoyTask] ligne %d fin tempo \n", __LINE__);
     } while (error == 0);
@@ -83,7 +84,6 @@ bool Enphase_get_7_Stream(void)
 
     // payload = https.getString();
     // Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
-
     https.end();
 
     retour = true;
@@ -163,7 +163,6 @@ bool Enphase_get_7_JWT(void)
       else
       {
         Serial.printf("[Enphase_get_7_JWT] ligne %d Enphase contrôle tocket : TOKEN INVALIDE !!! httpCode : %d \n", __LINE__, httpCode);
-
         https.end();
       }
     }

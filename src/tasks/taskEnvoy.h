@@ -3,7 +3,6 @@
 #include "../config/enums.h"
 #include "../functions/enphaseFunction.h"
 
-
 void envoyTask(void *parameter)
 {
   // delay(1000);
@@ -34,6 +33,7 @@ void envoyTask(void *parameter)
   Serial.println("[envoyTask] Début boucle Envoy");
   for (;;)
   {
+    // String payload;
     Enphase_get_7();
     vTaskDelay(4000 / portTICK_PERIOD_MS);
   }
