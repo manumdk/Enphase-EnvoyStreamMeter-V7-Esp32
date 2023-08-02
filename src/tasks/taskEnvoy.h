@@ -35,6 +35,6 @@ void envoyTask(void *parameter)
   for (;;)
   {
     Enphase_get_7();
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(4000 / portTICK_PERIOD_MS);
   }
 }

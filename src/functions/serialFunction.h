@@ -105,7 +105,7 @@ bool serial_read()
       prefEnvoy.begin("envoy", false);
       envoy.token = message_get.substring(5, message_get.length());
       envoy.token.trim();
-      Serial.println("token enregistré: " + envoy.token);
+      Serial.printf("\n*************\ntoken enregistré:\n%s\n *********** \n", envoy.token.c_str());
       prefEnvoy.putString("token", envoy.token);
       prefEnvoy.end();
       return true;
