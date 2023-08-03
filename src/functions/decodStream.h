@@ -46,7 +46,7 @@ int processingJsondata(String payload)
             dataEnvoy.Prod.f[pha] = obj["production"]["ph-a"]["f"];
             if (bLog)
             {
-                DEBUG_SERIAL.print("\nPhase B - ");
+                DEBUG_SERIAL.print("\nPhase A - ");
                 DEBUG_SERIAL.print("Real Power: ");
                 DEBUG_SERIAL.print(dataEnvoy.Prod.p[pha]);
                 DEBUG_SERIAL.print("\tReact Power: ");
@@ -76,7 +76,7 @@ int processingJsondata(String payload)
             if (dataEnvoy.Prod.v[phb] > 0 && bLog)
             {
 
-                DEBUG_SERIAL.print("\nPhase A - ");
+                DEBUG_SERIAL.print("\nPhase B - ");
                 DEBUG_SERIAL.print("Real Power: ");
                 DEBUG_SERIAL.print(dataEnvoy.Prod.p[phb]);
                 DEBUG_SERIAL.print("\tReact Power: ");
