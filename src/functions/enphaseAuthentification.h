@@ -13,38 +13,6 @@
 
 extern Envoy envoy;
 
-// const char *server = "entrez.enphaseenergy.com";       // Server URL
-// const char *server2 = "192.168.10.179";                // Server URL
-// String url = "https://entrez.enphaseenergy.com/login"; // Server URL
-// String url_2 = "https://entrez.enphaseenergy.com/entrez_tokens";
-// String url_3 = "https://" + String(server2) + "/auth/check_jwt";
-// String url_4 = "https://" + String(server2) + "/stream/meter";
-// String enphase_entez = "authFlow=entrezSession";
-// // String enphase_serial = "xxxxxxxx";    //
-
-// String data1 = "username=" + envoy.mail + "&password=" + envoy.pswd + "&" + enphase_entez;
-// String data2 = "serialNum=" + envoy.serial;
-// String token1;
-// String JWTTokentoken;
-// String sessionID_local;
-
-String server = "entrez.enphaseenergy.com";            // Server URL
-const char *server2 = envoy.host.c_str();                // Server URL
-String url = "https://entrez.enphaseenergy.com/login"; // Server URL
-String url_2 = "https://entrez.enphaseenergy.com/entrez_tokens";
-String url_3 = "https://" + String(server2) + "/auth/check_jwt";
-String url_4 = "https://" + String(server2) + "/stream/meter";
-
-String enphase_user =  envoy.mail; //
-String enphase_pwd =  envoy.pswd;//
-String enphase_entez = "authFlow=entrezSession";
-String enphase_serial = envoy.serial;
-// String data2 = "serialNum=" + enphase_serial;
-// String data1 = "username=" + enphase_user + "&password=" + enphase_pwd + "&" + enphase_entez;
-String token1 ;
-String JWTTokentoken;
-String sessionID_local ;
-
 WiFiClientSecure client;
 
 void setup_Auth()
@@ -63,7 +31,8 @@ void setup_Auth()
   else
   {
     client.setInsecure(); // skip verification
-String data1 = "username=" + enphase_user + "&password=" + enphase_pwd + "&" + enphase_entez;
+                          // String data = String("username=") + enphase_user + String("&password=") + enphase_pwd + String("&") + enphase_entez;
+
     Serial.println("Connected to Enphase server 1!");
     client.println("POST " + url + " HTTP/1.1");
     client.println("User-Agent: got (https://github.com/sindresorhus/got)");
@@ -74,26 +43,27 @@ String data1 = "username=" + enphase_user + "&password=" + enphase_pwd + "&" + e
     client.println("Connection: close");
     client.println();
     client.println(data1);
-    Serial.println(data1.c_str());
+    Serial.printf("[authEnphase] ligne %d data : %s \n", __LINE__, data1.c_str());
+
     while (client.connected())
     {
-      String line = client.readStringUntil('\n');
-      Serial.printf("[authEnphase] ligne %d  linechar %s \n", __LINE__, line.c_str());
+      String line;
+      line = client.readStringUntil('\n');
+
       char linechar[line.length() + 1];
       line.toCharArray(linechar, line.length() + 1);
       const char *lineconstchar = linechar;
 
       if (!strstr(lineconstchar, "SESSION"))
       {
-        Serial.printf("[authEnphase] ligne %d  Erreur Session \n", __LINE__);
+        // Serial.printf("[authEnphase] ligne %d  Erreur Session \n", __LINE__);
       }
       else
       {
-        Serial.printf("[authEnphase] ligne %d  Token 1 \n", __LINE__);
+        // Serial.printf("[authEnphase] ligne %d  Token 1 \n", __LINE__);
         token1 = line.substring(line.indexOf("SESSION"), line.indexOf(";"));
       }
     }
-
     Serial.printf("[authEnphase] ligne %d token1 : %s \n", __LINE__, token1.c_str());
 
     client.stop();
@@ -101,7 +71,7 @@ String data1 = "username=" + enphase_user + "&password=" + enphase_pwd + "&" + e
   // deuxiéme partie
   delay(100);
 
-  // Serial.println("\nStarting connection to Enphae server...2");
+  Serial.println("\nStarting connection to Enphae server...2");
   if (bLog)
     Serial.printf("\n[authEnphase] ligne %d Starting connection to Enphae server...2 :  \n", __LINE__);
 
@@ -112,9 +82,8 @@ String data1 = "username=" + enphase_user + "&password=" + enphase_pwd + "&" + e
     Serial.printf("\n[authEnphase] ligne %d Connection failed!  \n", __LINE__);
   }
   else
-  {
+  {client.setInsecure(); // skip verification
     Serial.printf("[authEnphase] ligne %d Connected to Enphase server 2!  \n", __LINE__);
-    String data2 = "serialNum=" + enphase_serial;
     client.println("POST " + url_2 + " HTTP/1.1");
     client.println("User-Agent: got (https://github.com/sindresorhus/got)");
     client.println("Cookie: " + token1);
@@ -124,8 +93,9 @@ String data1 = "username=" + enphase_user + "&password=" + enphase_pwd + "&" + e
     client.println("Host: entrez.enphaseenergy.com");
     client.println("Connection: close");
     client.println();
-    
+
     client.println(data2);
+    Serial.printf("[authEnphase] ligne %d data2 : %s \n", __LINE__, data2.c_str());
 
     while (client.connected())
     {

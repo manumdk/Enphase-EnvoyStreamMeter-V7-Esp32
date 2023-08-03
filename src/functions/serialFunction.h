@@ -202,7 +202,7 @@ void menu_setup()
   bExit = false;
   Serial.println("-------------------------------------------------------------");
   Serial.println("-------------------------------------------------------------");
-  Serial.println("Commande disponibles :");
+  Serial.println("Commandes disponibles :");
   Serial.println("'reboot' pour redémarrer le routeur ");
   Serial.println("'razwifi' pour effacer les paramétres wifi ");
   Serial.println("'razenvoy' pour effacer les paramétres envoy ");

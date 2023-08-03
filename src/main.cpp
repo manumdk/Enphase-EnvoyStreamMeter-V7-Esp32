@@ -137,7 +137,7 @@ void setup()
     xTaskCreatePinnedToCore(
         envoyTask,
         "envoyTask",         // Task name
-        10000,                // Stack size (bytes)
+        50000,                // Stack size (bytes)
         NULL,                // Parameter
         5,                   // Task priority
         NULL,                // Task handle
@@ -150,8 +150,12 @@ void setup()
 
   void loop()
   {
-    while (1)
-    {
-      /* code */
-    }
+    while (WiFi.status() != WL_CONNECTED)
+  {
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    Serial.println("[envoyTask] Pas de connection wifi ");
+  }
+  Serial.println("[envoyTask] Récup Token");
+  setup_Auth();
+  Serial.println("[envoyTask] Début boucle Envoy");
   }
