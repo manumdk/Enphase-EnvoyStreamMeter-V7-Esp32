@@ -70,36 +70,31 @@ struct Envoy
 
 enum Phase
 {
-    pha, // Phase A
-    phb, // Phase B
-    phc  // Phase C
+  pha, // Phase A
+  phb, // Phase B
+  phc  // Phase C
 };
 
 struct MesurePhase
 {
-    double p[3];  // Puissance Active
-    double q[3];  // Puissance Réactive
-    double s[3];  // Puissance Apparente
-    double v[3];  // Tension
-    double i[3];  // Intensité
-    double pf[3]; // Coefficient
-    double f[3];  // Fréquence
+  double p[3];  // Puissance Active
+  double q[3];  // Puissance Réactive
+  double s[3];  // Puissance Apparente
+  double v[3];  // Tension
+  double i[3];  // Intensité
+  double pf[3]; // Coefficient
+  double f[3];  // Fréquence
 };
 
 struct DataEnvoy
 {
-    MesurePhase Prod;  // Production des PV
-    MesurePhase Net;   // Mesure vue au niveau Linky
-    MesurePhase Conso; // Total consommé : Prod + Net
+  MesurePhase Prod;  // Production des PV
+  MesurePhase Net;   // Mesure vue au niveau Linky
+  MesurePhase Conso; // Total consommé : Prod + Net
 };
-
 
 Credentials credentials;
 Envoy envoy;
-
-
-
-
 
 #define EnvoyJ "/auth/check_jwt"
 #define EnvoyR "/api/v1/production"
@@ -115,7 +110,6 @@ HTTPClient https;
 String SessionId;
 
 //-------------------------------------------------------------------------------"
-
 
 bool serial_read()
 {
@@ -261,7 +255,7 @@ bool serial_read()
     {
       Serial.println("Quitte le menu ");
       bExit = true;
-      return  false;
+      return false;
     }
 
     if (message_get.length() != 0)
@@ -283,7 +277,6 @@ bool serial_read()
 }
 
 //-------------------------------------------------------------------------------"
-
 
 void menu_setup()
 {
@@ -374,8 +367,10 @@ bool Enphase_get_7_Stream(void)
       cl->find("data: ");
       payload = cl->readStringUntil('\n');
       // cl->flush();
-      if (payload.length() > 5)
-        Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
+      // if (payload.length() > 5)
+      error = cl->available();
+
+      Serial.printf("[envoyTask] ligne %d error %d Payload : lg %d \n%s\n", __LINE__, error, payload.length(), payload.c_str());
 
     } while (error);
     cl->stop();
@@ -471,24 +466,24 @@ bool Enphase_get_7_JWT(void)
 //-------------------------------------------------------------------------------"
 void Enphase_get_7_Token()
 {
-  
-String server = "entrez.enphaseenergy.com";            // Server URL
-const char *server2 = envoy.host.c_str();              // Server URL
-String url = "https://entrez.enphaseenergy.com/login"; // Server URL
-String url_2 = "https://entrez.enphaseenergy.com/entrez_tokens";
-String url_3 = "https://" + String(server2) + "/auth/check_jwt";
-String url_4 = "https://" + String(server2) + "/stream/meter";
 
-String enphase_user = envoy.mail; //
-String enphase_pwd = envoy.pswd;  //
-String enphase_entez = "authFlow=entrezSession";
-String enphase_serial = envoy.serial;
-String data2 = "serialNum=" + enphase_serial;
-String data1 = "username=" + enphase_user + "&password=" + enphase_pwd + "&" + enphase_entez;
-String token1;
-String JWTTokentoken;
-String sessionID_local;
-  
+  String server = "entrez.enphaseenergy.com";            // Server URL
+  const char *server2 = envoy.host.c_str();              // Server URL
+  String url = "https://entrez.enphaseenergy.com/login"; // Server URL
+  String url_2 = "https://entrez.enphaseenergy.com/entrez_tokens";
+  String url_3 = "https://" + String(server2) + "/auth/check_jwt";
+  String url_4 = "https://" + String(server2) + "/stream/meter";
+
+  String enphase_user = envoy.mail; //
+  String enphase_pwd = envoy.pswd;  //
+  String enphase_entez = "authFlow=entrezSession";
+  String enphase_serial = envoy.serial;
+  String data2 = "serialNum=" + enphase_serial;
+  String data1 = "username=" + enphase_user + "&password=" + enphase_pwd + "&" + enphase_entez;
+  String token1;
+  String JWTTokentoken;
+  String sessionID_local;
+
   // Serial.printf("[authEnphase] ligne %d data1 : %s\n", __LINE__, data1.c_str());
   // Serial.printf("[authEnphase] ligne %d data2 : %s\n", __LINE__, data2.c_str());
 
@@ -545,7 +540,7 @@ String sessionID_local;
 
   Serial.println("\nStarting connection to Enphae server...2");
   // if (bLog)
-    Serial.printf("\n[authEnphase] ligne %d Starting connection to Enphae server...2 :  \n", __LINE__);
+  Serial.printf("\n[authEnphase] ligne %d Starting connection to Enphae server...2 :  \n", __LINE__);
 
   client.setInsecure(); // skip verification
 
@@ -554,7 +549,8 @@ String sessionID_local;
     Serial.printf("\n[authEnphase] ligne %d Connection failed!  \n", __LINE__);
   }
   else
-  {client.setInsecure(); // skip verification
+  {
+    client.setInsecure(); // skip verification
     Serial.printf("[authEnphase] ligne %d Connected to Enphase server 2!  \n", __LINE__);
     client.println("POST " + url_2 + " HTTP/1.1");
     client.println("User-Agent: got (https://github.com/sindresorhus/got)");
@@ -591,7 +587,7 @@ String sessionID_local;
 
       if (!strstr(lineconstchar, "<textarea name=\"accessToken\" id=\"JWTToken\" cols=\"30\" rows=\"10\" >"))
       {
-        //Serial.printf("[authEnphase] ligne %d Pas de token \n", __LINE__);
+        // Serial.printf("[authEnphase] ligne %d Pas de token \n", __LINE__);
       }
       else
       {
@@ -605,10 +601,7 @@ String sessionID_local;
 
     client.stop();
   }
-
-  
 }
-
 
 //-------------------------------------------------------------------------------"
 
@@ -622,7 +615,8 @@ void Enphase_get_7(void)
     { // Permet de lancer le contrôle du token une fois au démarrage (Empty SessionId)
       SessionId.clear();
       Serial.printf("[Enphase_get_7] Enphase version 7, token : %s \n", envoy.token.c_str());
-      if (Enphase_get_7_JWT() == false){
+      if (Enphase_get_7_JWT() == false)
+      {
         Enphase_get_7_Token();
       }
     }
@@ -632,7 +626,6 @@ void Enphase_get_7(void)
     Serial.println("Enphase version 7 : ERROR");
   }
 }
-
 
 //-------------------------------------------------------------------------------"
 
@@ -703,7 +696,6 @@ void setup()
     Serial.println(WiFi.localIP());
   }
   delay(2000);
-
 }
 
 //-------------------------------------------------------------------------------"
