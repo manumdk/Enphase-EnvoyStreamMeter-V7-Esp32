@@ -1,0 +1,40 @@
+[SETUP] ligne 678 host : 192.168.10.179 
+[SETUP] ligne 679 port : 80 
+[SETUP] ligne 680 type : S
+[SETUP] ligne 681 mail : monmail@gmail.com
+[SETUP] ligne 682 pswd : monpswd
+[SETUP] ligne 683 serial : 123456789122
+[SETUP] ligne 684 token : GhklsdkljiOiI3ZDEwMDA1ZC03ODk5LTRkMGQtYmNiNC0yNDRmOThlZTE1NmIiLCJ0ghjsgdkjgHJGHJVGFjhvhjGhjbKbklmGdgfDgfCfDGRKzIiLCJpc3MiOiJFbnRyZXoiLCJlbnBoYXNlVXNlciI6Imluc3RhbGxlciIsImV4cCI6MTY5MTAwMjkzNCwiaWF0IjoxNjkwOTU5NzM0LCJqdGkiOiI5ZGQ5MzM1Ni1lY2JmLTQ0ZGItYTc3MS03MThjODZjZDliNjciLCJ1c2VybmFtZSI6IjY0MjEwZHVtYWlAZ21haWwuY29tIn0.4bvL5k_XikrucGPMZmBpV1j6xRqm3u6zsyaFEkdrpwDK0TeTY5n60loiG3Tn5H2f5DCkkxVSybRcOE5mHLEStg 
+Connecting to WiFi .....192.168.10.48
+WIFI_OK
+[Enphase_get_7] Enphase version 7, token : GhklsdkljiOiI3ZDEwMDA1ZC03ODk5LTRkMGQtYmNiNC0yNDRmOThlZTE1NmIiLCJ0ghjsgdkjgHJGHJVGFjhvhjGhjbKbklmGdgfDgfCfDGRKzIiLCJpc3MiOiJFbnRyZXoiLCJlbnBoYXNlVXNlciI6Imluc3RhbGxlciIsImV4cCI6MTY5MTAwMjkzNCwiaWF0IjoxNjkwOTU5NzM0LCJqdGkiOiI5ZGQ5MzM1Ni1lY2JmLTQ0ZGItYTc3MS03MThjODZjZDliNjciLCJ1c2VybmFtZSI6IjY0MjEwZHVtYWlAZ21haWwuY29tIn0.4bvL5k_XikrucGPMZmBpV1j6xRqm3u6zsyaFEkdrpwDK0TeTY5n60loiG3Tn5H2f5DCkkxVSybRcOE5mHLEStg 
+[Enphase_get_7_JWT] Enphase contrôle tocken : https://192.168.10.179/auth/check_jwt
+[Enphase_get_7_JWT] ligne 445 httpCode : 401 
+[Enphase_get_7_JWT] Enphase contrôle tocket : TOKEN INVALIDE !!!
+[authEnphase] ligne 494
+Connected to Enphase server 1!
+[authEnphase] ligne 517 data : username=monmail@gmail.com&password=monpswd&authFlow=entrezSession 
+[ 12084][E][ssl_client.cpp:37] _handle_error(): [data_to_read():361]: (-76) UNKNOWN ERROR CODE (004C)
+[authEnphase] ligne 538 token1 : SESSION=NzVjOWM3NzEtNjQ5ZS00ZTU1LTliZWEtYzY0ZWNlM2IzM2Y5 
+
+Starting connection to Enphae server...2
+
+[authEnphase] ligne 547 Starting connection to Enphae server...2 :
+[authEnphase] ligne 557 Connected to Enphase server 2!
+[authEnphase] ligne 569 data2 : serialNum=123456789122
+ authEnphase] ligne 577 line :
+[authEnphase] ligne 600 JWTTokentoken : GhklsdkljiOiI3ZDEwMDA1ZC03ODk5LTRkMGQtYmNiNC0yNDRmOThlZTE1NmIiLCJ0ghjsgdkjgHJGHJVGFjhvhjGhjbKbklmGdgfDgfCfDGRKzIiLCJpc3MiOiJFbnRyZXoiLCJlbnBoghjsgdkjgHJGHJVGFjhvhjGhjbKbklmGdgfDgfCfDGRKcCI6MTY5MTEyMjg2MywiaWF0IjoxNjkxMDc5NjYzLCJqdGkiOiJkMTlhOGU0MS0wYzgxLTQ2ZDEtYTU2My01NTEzMDQxYzQ2OGQiLCJ1c2VybmFtZSI6IjY0MjEwZHVtYWlAZ21haWwuY29tIn0.t49FJbuvLahCwWfz0PIo4aa9cgtKcOj3zN-COfsfiXyiRZqs7FIlnyt9vV9XhAO0KetvGkZD1EenVGSKzrgMDg
+[ 14777][E][ssl_client.cpp:37] _handle_error(): [data_to_read():361]: (-76) UNKNOWN ERROR CODE (004C)
+WIFI_OK
+[Enphase_get_7] Enphase version 7, token : GhklsdkljiOiI3ZDEwMDA1ZC03ODk5LTRkMGQtYmNiNC0yNDRmOThlZTE1NmIiLCJ0ghjsgdkjgHJGHJVGFjhvhjGhjbKbklmGdgfDgfCfDGRKzIiLCJpc3MiOiJFbnRyZXoiLCJlbnBoghjsgdkjgHJGHJVGFjhvhjGhjbKbklmGdgfDgfCfDGRKcCI6MTY5MTEyMjg2MywiaWF0IjoxNjkxMDc5NjYzLCJqdGkiOiJkMTlhOGU0MS0wYzgxLTQ2ZDEtYTU2My01NTEzMDQxYzQ2OGQiLCJ1c2VybmFtZSI6IjY0MjEwZHVtYWlAZ21haWwuY29tIn0.t49FJbuvLahCwWfz0PIo4aa9cgtKcOj3zN-COfsfiXyiRZqs7FIlnyt9vV9XhAO0KetvGkZD1EenVGSKzrgMDg
+[Enphase_get_7_JWT] Enphase contrôle tocken : https://192.168.10.179/auth/check_jwt
+[Enphase_get_7_JWT] ligne 445 httpCode : 200
+[Enphase_get_7_JWT] Enphase contrôle tocket : TOKEN VALIDE
+WIFI_OK
+type S /stream/meter
+[envoyTask] ligne 343 http://192.168.10.179/stream/meter
+[envoyTask] ligne 363 http code : 200
+[envoyTask] ligne 377 Payload : lg 716 
+{"production":{"ph-a":{"p":662.07,"q":161.882,"s":689.878,"v":237.436,"i":2.761,"pf":0.95,"f":50.0},"ph-b":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0},"ph-c":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0}},"net-consumption":{"ph-a":{"p":-109.187,"q":-505.377,"s":-722.439,"v":237.548,"i":-3.041,"pf":-1.0,"f":50.0},"ph-b":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0},"ph-c":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0}},"total-consumption":{"ph-a":{"p":552.883,"q":-343.495,"s":-66.576,"v":237.548,"i":-0.28,"pf":1.0,"f":50.0},"ph-b":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0},"ph-c":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0}}}
+[envoyTask] ligne 377 Payload : lg 714 
+{"production":{"ph-a":{"p":542.381,"q":164.777,"s":570.743,"v":237.127,"i":2.393,"pf":0.95,"f":50.0},"ph-b":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0},"ph-c":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0}},"net-consumption":{"ph-a":{"p":15.973,"q":-506.899,"s":716.55,"v":237.162,"i":3.021,"pf":0.02,"f":50.0},"ph-b":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0},"ph-c":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0}},"total-consumption":{"ph-a":{"p":558.354,"q":-342.121,"s":1284.008,"v":237.162,"i":5.414,"pf":0.43,"f":50.0},"ph-b":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0},"ph-c":{"p":0.0,"q":0.0,"s":0.0,"v":0.0,"i":0.0,"pf":0.0,"f":0.0}}}
