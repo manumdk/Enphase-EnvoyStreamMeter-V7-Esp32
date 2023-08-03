@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "../config/config.h"
 #include "../config/enums.h"
+#include "../functions/enphaseAuthentification.h"
 #include "../functions/enphaseFunction.h"
 
 void envoyTask(void *parameter)
@@ -30,7 +31,10 @@ void envoyTask(void *parameter)
     vTaskDelay(5000 / portTICK_PERIOD_MS);
     Serial.println("[envoyTask] Pas de connection Wifi ");
   }
+  Serial.println("[envoyTask] Récup Token");
+  setup_Auth();
   Serial.println("[envoyTask] Début boucle Envoy");
+
   for (;;)
   {
     // String payload;
