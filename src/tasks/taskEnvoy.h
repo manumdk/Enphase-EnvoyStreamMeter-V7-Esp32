@@ -38,7 +38,7 @@ void envoyTask(void *parameter)
   for (;;)
   {
     // String payload;
-    //Enphase_get_7();
+    Enphase_get_7();
     vTaskDelay(4000 / portTICK_PERIOD_MS);
   }
 }

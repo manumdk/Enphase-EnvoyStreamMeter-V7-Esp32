@@ -12,18 +12,18 @@
 
 
 String server = "entrez.enphaseenergy.com";            // Server URL
-const char *server2 = envoy.host.c_str();              // Server URL
+String server2;
 String url = "https://entrez.enphaseenergy.com/login"; // Server URL
 String url_2 = "https://entrez.enphaseenergy.com/entrez_tokens";
-String url_3 = "https://" + String(server2) + "/auth/check_jwt";
-String url_4 = "https://" + String(server2) + "/stream/meter";
+String url_3 ;
+String url_4 ;
 
-String enphase_user = envoy.mail; //
-String enphase_pwd = envoy.pswd;  //
-String enphase_entez = "authFlow=entrezSession";
-String enphase_serial = envoy.serial;
-String data2 = "serialNum=" + enphase_serial;
-String data1 = "username=" + enphase_user + "&password=" + enphase_pwd + "&" + enphase_entez;
+String enphase_user; //
+String enphase_pwd ;  //
+String enphase_entez;
+String enphase_serial ;
+String data2 ;
+String data1 ;
 String token1;
 String JWTTokentoken;
 String sessionID_local;

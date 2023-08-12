@@ -155,7 +155,7 @@ void setup()
     vTaskDelay(1000 / portTICK_PERIOD_MS);
     Serial.println("[envoyTask] Pas de connection wifi ");
   }
-  Serial.println("[envoyTask] Récup Token");
-  setup_Auth();
-  Serial.println("[envoyTask] Début boucle Envoy");
+  // Serial.println("[envoyTask] Récup Token");
+  // setup_Auth();
+  // Serial.println("[envoyTask] Début boucle Envoy");
   }
