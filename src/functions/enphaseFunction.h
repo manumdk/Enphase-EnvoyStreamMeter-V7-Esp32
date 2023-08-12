@@ -14,128 +14,6 @@ String payload;
 String SessionId;
 HTTPClient https;
 
-//-------------------------------------------------------------------------------"
-bool Enphase_get_7_Stream_old(void)
-{
-
-  int httpCode;
-  bool retour = false;
-  String adr = String(envoy.host);
-  String url = "/404.html";
-  if (String(envoy.type) == "R")
-  {
-    url = String(EnvoyR);
-    Serial.print("type R ");
-    Serial.println(url);
-  }
-  if (String(envoy.type) == "S")
-  {
-    url = String(EnvoyStream);
-    Serial.print("type S ");
-    Serial.println(url);
-  }
-
-  // Serial.println("Enphase Get production : https://" + adr + url);
-
-  Serial.printf("[envoyTask] ligne %d https://", __LINE__);
-  Serial.println(adr + url);
-
-  if (https.begin("https://" + adr + url))
-  {
-#ifdef DEBUG
-    Serial.printf("[envoyTask] ligne %d Begin OK \n", __LINE__);
-#endif
-    https.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
-    https.setAuthorizationType("Bearer");
-    https.setAuthorization(envoy.token.c_str());
-    https.addHeader("Accept-Encoding", "gzip, deflate, br");
-    https.addHeader("User-Agent", "PvRouter/1.1.1");
-    https.setReuse(true);
-    if (!SessionId.isEmpty())
-    {
-      https.addHeader("Cookie", SessionId);
-    }
-  }
-  httpCode = https.GET();
-  Serial.printf("[envoyTask] ligne %d http code : %d \n", __LINE__, httpCode);
-
-  // while (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
-  while (httpCode == 200)
-  {
-    vTaskDelay(200 / portTICK_PERIOD_MS);
-    int error = 0;
-    WiFiClient *cl = https.getStreamPtr();
-    int compteur = 10;
-    do
-    {
-      cl->find("data: ");
-      payload = cl->readStringUntil('\n');
-      error = cl->getWriteError();
-      // cl->flush();
-      if (payload.length() > 10)
-      {
-        if (bLog || compteur == 10)
-        {
-          Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
-          compteur = 0;
-        }
-      }
-      else
-      {
-        Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
-      }
-      int retError = processingJsondata(payload);
-      vTaskDelay(300 / portTICK_PERIOD_MS);
-      compteur++;
-
-    } while (error == 0);
-    cl->stop();
-    cl->clearWriteError();
-    Serial.printf("[envoyTask] ligne %d Error : %d \n", __LINE__, error);
-
-    // payload = https.getString();
-    // Serial.printf("[envoyTask] ligne %d Payload : lg %d \n%s\n", __LINE__, payload.length(), payload.c_str());
-    https.end();
-
-    retour = true;
-#ifdef DEBUG
-    Serial.printf("[envoyTask] ligne %d fin de la réception\n", __LINE__);
-#endif
-    vTaskDelay(500 / portTICK_PERIOD_MS);
-
-#ifdef DEBUG
-    Serial.printf("[envoyTask] ligne %d begin du https://", __LINE__);
-    Serial.println(adr + url);
-#endif
-
-    if (https.connected())
-    {
-      bool ret = https.begin("https://" + adr + url);
-#ifdef DEBUG
-      Serial.printf("[envoyTask] ligne %d Begin OK : %d \n", __LINE__, ret);
-#endif
-      https.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
-      https.setAuthorizationType("Bearer");
-      https.setAuthorization(envoy.token.c_str());
-      https.addHeader("Accept-Encoding", "gzip, deflate, br");
-      https.addHeader("User-Agent", "PvRouter/1.1.1");
-      https.setReuse(true);
-      if (!SessionId.isEmpty())
-      {
-        https.addHeader("Cookie", SessionId);
-      }
-    }
-    httpCode = https.GET();
-#ifdef DEBUG
-    Serial.printf("[envoyTask] ligne %d code http : %d \n", __LINE__, httpCode);
-#endif
-  } // fin du While
-
-  Serial.printf("[envoyTask] ligne %d GET... failed , error: %d \n", __LINE__, httpCode);
-  Serial.printf("[envoyTask] ligne %d GET... failed , error: %s \n", __LINE__, https.errorToString(httpCode).c_str());
-  https.end();
-  return retour;
-}
 
 //-------------------------------------------------------------------------------"
 bool Enphase_get_7_Stream(void)
@@ -198,6 +76,7 @@ bool Enphase_get_7_Stream(void)
       error = cl->available();
 
       Serial.printf("[envoyTask] ligne %d error %d Payload : lg %d \n%s\n", __LINE__, error, payload.length(), payload.c_str());
+      processingJsondata(payload);
       vTaskDelay(100 / portTICK_PERIOD_MS);
     } while (error);
     cl->stop();
