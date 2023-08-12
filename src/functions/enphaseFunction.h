@@ -75,7 +75,7 @@ bool Enphase_get_7_Stream(void)
       // if (payload.length() > 5)
       error = cl->available();
 
-      Serial.printf("[envoyTask] ligne %d error %d Payload : lg %d \n%s\n", __LINE__, error, payload.length(), payload.c_str());
+      Serial.printf("[envoyTask] ligne %d errors %d Payload : lg %d \n%s\n", __LINE__, error, payload.length(), payload.c_str());
       processingJsondata(payload);
       vTaskDelay(100 / portTICK_PERIOD_MS);
     } while (error);

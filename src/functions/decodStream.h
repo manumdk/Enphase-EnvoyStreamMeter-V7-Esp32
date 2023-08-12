@@ -14,8 +14,9 @@ enum Phase ph;
 
 // Routine de gestion et impression des donnes JSON
 
-int processingJsondata(String payload)      //TODO pb de passage dans cette routine
+int processingJsondata(String payload)
 {
+    Serial.printf("[processingJsondata] ligne %d Lancement décodage \n", __LINE__);
 
     DynamicJsonDocument doc(2000); // Added from envoy exemple
 
@@ -27,7 +28,7 @@ int processingJsondata(String payload)      //TODO pb de passage dans cette rout
     {
         DEBUG_SERIAL.print(F("*************** deserializeJson() failed: "));
         DEBUG_SERIAL.println(error.f_str());
-        DEBUG_SERIAL.printf("message recu, lg %i, message : %s \n",payload.length(), payload);
+        DEBUG_SERIAL.printf("message recu, lg %i, message : %s \n", payload.length(), payload);
         return 0;
     }
 
@@ -46,7 +47,7 @@ int processingJsondata(String payload)      //TODO pb de passage dans cette rout
             dataEnvoy.Prod.f[pha] = obj["production"]["ph-a"]["f"];
             if (bLog)
             {
-                DEBUG_SERIAL.print("\nPhase B - ");
+                DEBUG_SERIAL.print("\nPhase A - ");
                 DEBUG_SERIAL.print("Real Power: ");
                 DEBUG_SERIAL.print(dataEnvoy.Prod.p[pha]);
                 DEBUG_SERIAL.print("\tReact Power: ");
@@ -76,7 +77,7 @@ int processingJsondata(String payload)      //TODO pb de passage dans cette rout
             if (dataEnvoy.Prod.v[phb] > 0 && bLog)
             {
 
-                DEBUG_SERIAL.print("\nPhase A - ");
+                DEBUG_SERIAL.print("\nPhase B - ");
                 DEBUG_SERIAL.print("Real Power: ");
                 DEBUG_SERIAL.print(dataEnvoy.Prod.p[phb]);
                 DEBUG_SERIAL.print("\tReact Power: ");
@@ -166,7 +167,7 @@ int processingJsondata(String payload)      //TODO pb de passage dans cette rout
             dataEnvoy.Net.f[pha] = obj["net-consumption"]["ph-a"]["f"];
             if (bLog)
             {
-                DEBUG_SERIAL.print("\nPhase B - ");
+                DEBUG_SERIAL.print("\nPhase A - ");
                 DEBUG_SERIAL.print("Real Power: ");
                 DEBUG_SERIAL.print(dataEnvoy.Net.p[pha]);
                 DEBUG_SERIAL.print("\tReact Power: ");
@@ -195,7 +196,7 @@ int processingJsondata(String payload)      //TODO pb de passage dans cette rout
 
             if (dataEnvoy.Net.v[phb] > 0 && bLog)
             {
-                DEBUG_SERIAL.print("\nPhase A - ");
+                DEBUG_SERIAL.print("\nPhase B - ");
                 DEBUG_SERIAL.print("Real Power: ");
                 DEBUG_SERIAL.print(dataEnvoy.Net.p[phb]);
                 DEBUG_SERIAL.print("\tReact Power: ");
@@ -283,7 +284,7 @@ int processingJsondata(String payload)      //TODO pb de passage dans cette rout
             dataEnvoy.Net.f[pha] = obj["total-consumption"]["ph-a"]["f"];
             if (bLog)
             {
-                DEBUG_SERIAL.print("\nPhase B - ");
+                DEBUG_SERIAL.print("\nPhase A - ");
                 DEBUG_SERIAL.print("Real Power: ");
                 DEBUG_SERIAL.print(dataEnvoy.Net.p[pha]);
                 DEBUG_SERIAL.print("\tReact Power: ");
@@ -313,7 +314,7 @@ int processingJsondata(String payload)      //TODO pb de passage dans cette rout
             if (dataEnvoy.Net.v[phb] > 0 && bLog)
             {
 
-                DEBUG_SERIAL.print("\nPhase A - ");
+                DEBUG_SERIAL.print("\nPhase B - ");
                 DEBUG_SERIAL.print("Real Power: ");
                 DEBUG_SERIAL.print(dataEnvoy.Net.p[phb]);
                 DEBUG_SERIAL.print("\tReact Power: ");
