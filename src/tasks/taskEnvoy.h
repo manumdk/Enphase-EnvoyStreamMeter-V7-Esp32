@@ -1,7 +1,9 @@
+#ifndef TASK_ENVOY
+#define TASK_ENVOY
+
 #include <Arduino.h>
 #include "../config/config.h"
 #include "../config/enums.h"
-#include "../functions/enphaseAuthentification.h"
 #include "../functions/enphaseFunction.h"
 
 void envoyTask(void *parameter)
@@ -42,3 +44,4 @@ void envoyTask(void *parameter)
     vTaskDelay(4000 / portTICK_PERIOD_MS);
   }
 }
+#endif

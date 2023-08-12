@@ -4,8 +4,10 @@
 #include <Arduino.h>
 #include "../config/config.h"
 #include "../config/enums.h"
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include "../functions/decodStream.h"
+WiFiClientSecure client;
 
 // extern Preferences prefWifi;
 // extern Preferences prefEnvoy;
@@ -86,7 +88,6 @@ bool Enphase_get_7_Stream(void)
 #ifdef DEBUG
     Serial.printf("[envoyTask] ligne %d fin de la réception\n", __LINE__);
 #endif
-    serial_read();
     vTaskDelay(200 / portTICK_PERIOD_MS);
 
 #ifdef DEBUG
