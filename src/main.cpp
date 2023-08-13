@@ -22,13 +22,28 @@ https://github.com/manumdk/Enphase-EnvoyStreamMeter-V7-Esp32
 
 Envoy envoy;
 Configwifi configwifi;
-
+void infos()
+{
+  esp_chip_info_t out_info;
+  esp_chip_info(&out_info);
+  Serial.print("CPU freq : "); Serial.println(String(ESP.getCpuFreqMHz()) + " MHz");
+  Serial.print("CPU cores : ");  Serial.println(String(out_info.cores));
+  Serial.print("Flash size : "); Serial.println(String(ESP.getFlashChipSize() / 1000000) + " MB");
+  Serial.print("Free RAM : "); Serial.println(String((long)ESP.getFreeHeap()) + " bytes");
+  //Serial.print("Min. free seen : "); Serial.println(String((long)esp_get_minimum_free_heap_size()) + " bytes");
+  Serial.print("tskIDLE_PRIORITY : "); Serial.println(String((long)tskIDLE_PRIORITY));
+  Serial.print("configMAX_PRIORITIES : "); Serial.println(String((long)configMAX_PRIORITIES));
+  Serial.print("configTICK_RATE_HZ : "); Serial.println(String(configTICK_RATE_HZ) + " Hz");
+  Serial.println();
+}
 //-------------------------------------------------------------------------------"
 
 void setup()
 {
   Serial.begin(115200);
-  menu_setup();
+ 
+infos();
+
   configwifi.recup_wifi();
   Serial.printf("[SETUP] ligne %d SID : %s \n", __LINE__, String(configwifi.SID));
   Serial.printf("[SETUP] ligne %d passwd : %s \n", __LINE__, String(configwifi.passwd));
