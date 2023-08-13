@@ -16,7 +16,6 @@ String payload;
 String SessionId;
 HTTPClient https;
 
-
 //-------------------------------------------------------------------------------"
 bool Enphase_get_7_Stream(void)
 {
@@ -24,21 +23,7 @@ bool Enphase_get_7_Stream(void)
   int httpCode;
   bool retour = false;
   String adr = String(envoy.host);
-  String url = "/404.html";
-  if (String(envoy.type) == "R")
-  {
-    url = String(EnvoyR);
-    Serial.print("type R ");
-    Serial.println(url);
-  }
-  if (String(envoy.type) == "S")
-  {
-    url = String(EnvoyStream);
-    Serial.print("type S ");
-    Serial.println(url);
-  }
-
-  // Serial.println("Enphase Get production : https://" + adr + url);
+  String url = String(EnvoyStream);
 
   Serial.printf("[envoyTask] ligne %d http://", __LINE__);
   Serial.println(adr + url);
@@ -62,9 +47,8 @@ bool Enphase_get_7_Stream(void)
   httpCode = https.GET();
   Serial.printf("[envoyTask] ligne %d http code : %d \n", __LINE__, httpCode);
 
-  // while (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
+  while (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
 
-  while (httpCode == 200)
   {
     String payload;
     WiFiClient *cl = https.getStreamPtr();
@@ -73,10 +57,7 @@ bool Enphase_get_7_Stream(void)
     {
       cl->find("data: ");
       payload = cl->readStringUntil('\n');
-      // cl->flush();
-      // if (payload.length() > 5)
       error = cl->available();
-
       Serial.printf("[envoyTask] ligne %d errors %d Payload : lg %d \n%s\n", __LINE__, error, payload.length(), payload.c_str());
       processingJsondata(payload);
       vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -145,8 +126,6 @@ bool Enphase_get_7_JWT(void)
     https.collectHeaders(headerkeys, sizeof(headerkeys) / sizeof(char *));
     int httpCode = https.GET();
 
-    // httpCode will be negative on error
-    // Serial.println("Enphase_Get_7 : httpcode : " + httpCode);
     if (httpCode > 0)
     {
       if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
@@ -177,12 +156,12 @@ bool Enphase_get_7_JWT(void)
 void Enphase_get_7_Token()
 {
 
-  String server = "entrez.enphaseenergy.com";            // Server URL
-  const char *server2 = envoy.host.c_str();              // Server URL
-  String url = "https://entrez.enphaseenergy.com/login"; // Server URL
-  String url_2 = "https://entrez.enphaseenergy.com/entrez_tokens";
-  String url_3 = "https://" + String(server2) + "/auth/check_jwt";
-  String url_4 = "https://" + String(server2) + "/stream/meter";
+  String server = "entrez.enphaseenergy.com";       // Server URL
+  const char *server2 = envoy.host.c_str();         // Server URL
+  String url = "https://" + server + +EnphaseLogin; // Server URL
+  String url_2 = "https://" + server + EnphaseTokens;
+  String url_3 = "https://" + String(server2) + EnphaseJwt;
+  String url_4 = "https://" + String(server2) + EnphaseStream;
 
   String enphase_user = envoy.mail; //
   String enphase_pwd = envoy.pswd;  //
@@ -249,8 +228,8 @@ void Enphase_get_7_Token()
   delay(100);
 
   Serial.println("\nStarting connection to Enphae server...2");
-  // if (bLog)
-  Serial.printf("\n[authEnphase] ligne %d Starting connection to Enphae server...2 :  \n", __LINE__);
+  if (bLog)
+    Serial.printf("\n[authEnphase] ligne %d Starting connection to Enphae server...2 :  \n", __LINE__);
 
   client.setInsecure(); // skip verification
 
@@ -306,7 +285,16 @@ void Enphase_get_7_Token()
         JWTTokentoken = (line.substring(debut, line.indexOf("</tex")));
         Serial.printf("[authEnphase] ligne %d JWTTokentoken : %s \n", __LINE__, JWTTokentoken.c_str());
       }
-      envoy.token = JWTTokentoken;
+      if (envoy.token != JWTTokentoken && JWTTokentoken.c_str() != "")
+      {
+        Serial.printf("[authEnphase] ligne %d Nouveau token : %s \n", __LINE__, JWTTokentoken.c_str());
+        envoy.token = JWTTokentoken;
+        envoy.sauve_envoy();
+      }
+
+#ifdef NTP
+      // envoy.token_timestamp= tempsunix;//TODO version NTP
+#endif
     }
 
     client.stop();
@@ -317,27 +305,11 @@ void Enphase_get_7_Token()
 
 void Enphase_get_7(void)
 {
-
   if (WiFi.isConnected())
   {
-    // create an HTTPClient instance
-    // retour
-
-    String sessionID_local;
-
     if (SessionId.isEmpty() || Enphase_get_7_Stream() == false)
-    {                               // Permet de lancer le contrôle du token une fois au démarrage (Empty SessionId)
-      server2 = envoy.host.c_str(); // Server URL
+    { // Permet de lancer le contrôle du token une fois au démarrage (Empty SessionId)
 
-      url_3 = "https://" + server2 + "/auth/check_jwt";
-      url_4 = "https://" + server2 + "/stream/meter";
-
-      enphase_user = envoy.mail; //
-      enphase_pwd = envoy.pswd;  //
-      enphase_entez = "authFlow=entrezSession";
-      enphase_serial = envoy.serial;
-      data2 = "serialNum=" + enphase_serial;
-      data1 = "username=" + enphase_user + "&password=" + enphase_pwd + "&" + enphase_entez;
       SessionId.clear();
       Serial.printf("[Enphase_get_7] Enphase version 7, token : -%s- \n", envoy.token.c_str());
       if (Enphase_get_7_JWT() == false)

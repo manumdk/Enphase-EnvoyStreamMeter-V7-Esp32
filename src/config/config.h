@@ -29,10 +29,7 @@
 #endif
 
 
-#define EnvoyJ "/auth/check_jwt"
-#define EnvoyR "/api/v1/production"
-#define EnvoyS "/production.json"
-#define EnvoyStream "/stream/meter"
+
 
 #endif
 

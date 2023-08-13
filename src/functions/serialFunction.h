@@ -5,12 +5,9 @@
 #include <Arduino.h>
 #include "../config/config.h"
 #include "../config/enums.h"
-
-extern Preferences prefWifi;
-extern Preferences prefEnvoy;
-extern Credentials credentials;
+#include "../config/config-Stream.h"
+extern Configwifi configwifi;
 extern Envoy envoy;
-
 
 bool bExit = false;
 
@@ -43,7 +40,7 @@ bool serial_read()
     if (index != -1)
     {
       Serial.println("commande raz wifi reçue");
-      prefWifi.clear();
+      configwifi.raz_wifi();
       delay(2000);
       Serial.println("reboot suite au raz des préférences");
       ESP.restart();
@@ -53,7 +50,7 @@ bool serial_read()
     if (index != -1)
     {
       Serial.println("commande raz envoy reçue");
-      prefEnvoy.clear();
+      envoy.raz_envoy();
       delay(2000);
       Serial.println("reboot suite au raz des préférences");
       ESP.restart();
@@ -62,108 +59,96 @@ bool serial_read()
     index = message_get.indexOf("ssid");
     if (index != -1)
     {
-      credentials.ssid = message_get.substring(5, message_get.length());
-      Serial.println("ssid enregistré: " + credentials.ssid);
-      prefWifi.putString("ssid", credentials.ssid);
+      message_get = message_get.substring(5, message_get.length());
+      message_get.toCharArray( configwifi.SID,message_get.length()+1);
+      Serial.println("ssid enregistré: " + String(configwifi.SID));
+      configwifi.sauve_wifi(); 
       return true;
     }
 
     index = message_get.indexOf("pass");
     if (index != -1)
     {
-      credentials.password = message_get.substring(5, message_get.length());
-      Serial.println("password enregistré: " + credentials.password);
-      prefWifi.putString("password", credentials.password);
+      message_get = message_get.substring(5, message_get.length());
+      message_get.toCharArray( configwifi.passwd,message_get.length()+1);      
+      Serial.println("password enregistré: " + String(configwifi.passwd));
+      configwifi.sauve_wifi(); 
       return true;
     }
 
     index = message_get.indexOf("mail");
     if (index != -1)
     {
-      prefEnvoy.begin("envoy", false);
       envoy.mail = message_get.substring(5, message_get.length());
       Serial.println("mail enregistré: " + envoy.mail);
-      prefEnvoy.putString("mail", envoy.mail);
-      prefEnvoy.end();
+      envoy.sauve_envoy();
       return true;
     }
 
     index = message_get.indexOf("pswd");
     if (index != -1)
     {
-      prefEnvoy.begin("envoy", false);
       envoy.pswd = message_get.substring(5, message_get.length());
       Serial.println("pswd enregistré: " + envoy.pswd);
-      prefEnvoy.putString("pswd", envoy.pswd);
-      prefEnvoy.end();
+      envoy.sauve_envoy();
       return true;
     }
 
     index = message_get.indexOf("token");
     if (index != -1)
     {
-      prefEnvoy.begin("envoy", false);
       envoy.token = message_get.substring(5, message_get.length());
       envoy.token.trim();
       Serial.printf("\n*************\ntoken enregistré:\n%s\n *********** \n", envoy.token.c_str());
-      prefEnvoy.putString("token", envoy.token);
-      prefEnvoy.end();
+      envoy.sauve_envoy();
       return true;
     }
 
     index = message_get.indexOf("host");
     if (index != -1)
     {
-      prefEnvoy.begin("envoy", false);
       envoy.host = message_get.substring(5, message_get.length());
       Serial.println("host enregistré: " + envoy.host);
-      prefEnvoy.putString("host", envoy.host);
-      prefEnvoy.end();
+      envoy.sauve_envoy();
       return true;
     }
 
     index = message_get.indexOf("port");
     if (index != -1)
     {
-      prefEnvoy.begin("envoy", false);
       envoy.port = message_get.substring(5, message_get.length());
       Serial.println("port enregistré: " + envoy.port);
-      prefEnvoy.putString("port", envoy.port);
-      prefEnvoy.end();
+      envoy.sauve_envoy();
       return true;
     }
 
     index = message_get.indexOf("type");
     if (index != -1)
     {
-      prefEnvoy.begin("envoy", false);
       envoy.type = message_get.substring(5, message_get.length());
       Serial.println("type enregistré: " + envoy.type);
-      prefEnvoy.putString("type", envoy.type);
-      prefEnvoy.end();
+      envoy.sauve_envoy();
       return true;
     }
     index = message_get.indexOf("serial");
     if (index != -1)
     {
-      prefEnvoy.begin("envoy", false);
       envoy.serial = message_get.substring(7, message_get.length());
       Serial.println("serial enregistré: " + envoy.serial);
-      prefEnvoy.putString("serial", envoy.serial);
-      prefEnvoy.end();
+      envoy.sauve_envoy();
       return true;
     }
     index = message_get.indexOf("LOG");
     if (index != -1)
     {
-      Serial.println("Activation Log série" );
+      Serial.println("Activation Log série");
       bLog = true;
       return false;
     }
-        index = message_get.indexOf("log");
+    index = message_get.indexOf("log");
     if (index != -1)
     {
-      Serial.println("Stop Log série" );
+      Serial.println("Stop Log série");
       bLog = false;
       return false;
     }
@@ -173,7 +158,7 @@ bool serial_read()
     {
       Serial.println("Quitte le menu ");
       bExit = true;
-      return  false;
+      return false;
     }
 
     if (message_get.length() != 0)
@@ -195,7 +180,6 @@ bool serial_read()
 }
 
 //-------------------------------------------------------------------------------"
-
 
 void menu_setup()
 {
