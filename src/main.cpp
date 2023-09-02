@@ -26,16 +26,24 @@ void infos()
 {
   esp_chip_info_t out_info;
   esp_chip_info(&out_info);
-  Serial.print("CPU freq : "); Serial.println(String(ESP.getCpuFreqMHz()) + " MHz");
-  Serial.print("CPU cores : ");  Serial.println(String(out_info.cores));
-  Serial.print("Flash size : "); Serial.println(String(ESP.getFlashChipSize() / 1000000) + " MB");
-  Serial.print("Free RAM : "); Serial.println(String((long)ESP.getFreeHeap()) + " bytes");
-  //Serial.print("Min. free seen : "); Serial.println(String((long)esp_get_minimum_free_heap_size()) + " bytes");
-  Serial.print("tskIDLE_PRIORITY : "); Serial.println(String((long)tskIDLE_PRIORITY));
-  Serial.print("configMAX_PRIORITIES : "); Serial.println(String((long)configMAX_PRIORITIES));
-  Serial.print("configTICK_RATE_HZ : "); Serial.println(String(configTICK_RATE_HZ) + " Hz");
+  Serial.print("CPU freq : ");
+  Serial.println(String(ESP.getCpuFreqMHz()) + " MHz");
+  Serial.print("CPU cores : ");
+  Serial.println(String(out_info.cores));
+  Serial.print("Flash size : ");
+  Serial.println(String(ESP.getFlashChipSize() / 1000000) + " MB");
+  Serial.print("Free RAM : ");
+  Serial.println(String((long)ESP.getFreeHeap()) + " bytes");
+  // Serial.print("Min. free seen : "); Serial.println(String((long)esp_get_minimum_free_heap_size()) + " bytes");
+  Serial.print("tskIDLE_PRIORITY : ");
+  Serial.println(String((long)tskIDLE_PRIORITY));
+  Serial.print("configMAX_PRIORITIES : ");
+  Serial.println(String((long)configMAX_PRIORITIES));
+  Serial.print("configTICK_RATE_HZ : ");
+  Serial.println(String(configTICK_RATE_HZ) + " Hz");
   Serial.println();
 }
+
 //-------------------------------------------------------------------------------"
 
 void setup()
