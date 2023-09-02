@@ -332,7 +332,7 @@ bool Enphase_get_7_Stream(void)
   Serial.printf("[envoyTask] ligne %d http code : %d \n", __LINE__, httpCode);
 
   // while (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
-  while (httpCode == 200)
+  if (httpCode == 200)
   {
     String payload;
     WiFiClient *cl = https.getStreamPtr();
